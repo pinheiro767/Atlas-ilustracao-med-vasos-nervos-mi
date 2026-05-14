@@ -488,3 +488,39 @@ if("serviceWorker" in navigator){
 }
 
 render();
+
+document.addEventListener("click", e => {
+  const img = e.target.closest(".thumb img");
+  if(img){
+    const overlay = document.createElement("div");
+    overlay.style.cssText = `
+      position:fixed;inset:0;background:rgba(0,0,0,.92);
+      display:flex;align-items:center;justify-content:center;
+      z-index:99999;padding:1rem;
+    `;
+    overlay.innerHTML = `
+      <div style="position:relative;width:100%;height:100%;display:flex;align-items:center;justify-content:center;overflow:auto">
+        <button id="closeZoom" style="
+          position:fixed;top:20px;right:20px;width:54px;height:54px;
+          border-radius:999px;border:0;background:#ef4444;color:white;
+          font-size:2rem;font-weight:900;cursor:pointer;z-index:2">×</button>
+        <img src="${img.src}" style="
+          max-width:none;
+          width:auto;
+          height:auto;
+          min-width:70%;
+          transform:scale(1.6);
+          transform-origin:center;
+          border-radius:24px;
+          box-shadow:0 25px 80px rgba(0,0,0,.6);
+        ">
+      </div>
+    `;
+    document.body.appendChild(overlay);
+    overlay.onclick = (ev)=>{
+      if(ev.target.id === "closeZoom" || ev.target === overlay){
+        overlay.remove();
+      }
+    };
+  }
+});
