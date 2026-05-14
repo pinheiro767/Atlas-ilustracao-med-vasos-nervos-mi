@@ -318,12 +318,77 @@ const cardsEl = document.getElementById("cards");
 const template = document.getElementById("cardTemplate");
 const searchInput = document.getElementById("searchInput");
 const pdfBtn = document.getElementById("pdfBtn");
-let mediaStore = JSON.parse(localStorage.getItem("arterias_media") || "{}");
-let notesStore = JSON.parse(localStorage.getItem("arterias_notes") || "{}");
 
-function saveStores(){
-  localStorage.setItem("arterias_media", JSON.stringify(mediaStore));
+let notesStore = JSON.parse(localStorage.getItem("arterias_notes") || "{}");
+let mediaCache = {};
+
+function saveNotes(){
   localStorage.setItem("arterias_notes", JSON.stringify(notesStore));
+}
+
+/* BANCO LOCAL GRANDE — IndexedDB
+   Corrige o problema de limite de poucas fotos.
+   Agora as imagens ficam salvas no armazenamento do navegador,
+   com capacidade muito maior que localStorage. */
+const DB_NAME = "AtlasArteriasMIDB";
+const DB_VERSION = 1;
+const STORE_NAME = "media";
+
+function openDB(){
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open(DB_NAME, DB_VERSION);
+    request.onupgradeneeded = event => {
+      const db = event.target.result;
+      if(!db.objectStoreNames.contains(STORE_NAME)){
+        const store = db.createObjectStore(STORE_NAME, { keyPath: "id", autoIncrement: true });
+        store.createIndex("structureId", "structureId", { unique: false });
+      }
+    };
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
+}
+
+async function addMediaToDB(item){
+  const db = await openDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(STORE_NAME, "readwrite");
+    const store = tx.objectStore(STORE_NAME);
+    const req = store.add(item);
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+}
+
+async function getAllMediaFromDB(){
+  const db = await openDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(STORE_NAME, "readonly");
+    const store = tx.objectStore(STORE_NAME);
+    const req = store.getAll();
+    req.onsuccess = () => resolve(req.result || []);
+    req.onerror = () => reject(req.error);
+  });
+}
+
+async function deleteMediaFromDB(id){
+  const db = await openDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(STORE_NAME, "readwrite");
+    const store = tx.objectStore(STORE_NAME);
+    const req = store.delete(id);
+    req.onsuccess = () => resolve();
+    req.onerror = () => reject(req.error);
+  });
+}
+
+async function loadMediaCache(){
+  const all = await getAllMediaFromDB();
+  mediaCache = {};
+  all.forEach(m => {
+    mediaCache[m.structureId] = mediaCache[m.structureId] || [];
+    mediaCache[m.structureId].push(m);
+  });
 }
 
 function render(){
@@ -349,7 +414,7 @@ function render(){
     notes.value = notesStore[s.id] || "";
     notes.addEventListener("input", e => {
       notesStore[s.id] = e.target.value;
-      saveStores();
+      saveNotes();
     });
     node.querySelector(".cameraInput").addEventListener("change", e => addFiles(s.id, e.target.files));
     node.querySelector(".fileInput").addEventListener("change", e => addFiles(s.id, e.target.files));
@@ -358,17 +423,26 @@ function render(){
   });
 }
 
-function addFiles(id, files){
-  [...files].forEach(file => {
-    const reader = new FileReader();
-    reader.onload = () => {
-      mediaStore[id] = mediaStore[id] || [];
-      mediaStore[id].push({name:file.name, type:file.type, data:reader.result, date:new Date().toLocaleString("pt-BR")});
-      saveStores();
-      renderPreview(id);
-    };
-    reader.readAsDataURL(file);
-  });
+async function addFiles(structureId, files){
+  for(const file of [...files]){
+    try{
+      const item = {
+        structureId: Number(structureId),
+        name: file.name || "foto.jpg",
+        type: file.type || "image/jpeg",
+        blob: file,
+        date: new Date().toLocaleString("pt-BR")
+      };
+      const id = await addMediaToDB(item);
+      item.id = id;
+      mediaCache[structureId] = mediaCache[structureId] || [];
+      mediaCache[structureId].push(item);
+      renderPreview(structureId);
+    }catch(err){
+      alert("Não foi possível salvar esta foto. Verifique o espaço do aparelho ou permissões do navegador.");
+      console.error(err);
+    }
+  }
 }
 
 function renderPreview(id){
@@ -376,17 +450,18 @@ function renderPreview(id){
   if(!card) return;
   const preview = card.querySelector(".preview");
   preview.innerHTML = "";
-  (mediaStore[id] || []).forEach((m, idx) => {
+  (mediaCache[id] || []).forEach((m) => {
     const div = document.createElement("div");
     div.className = "thumb";
     if(m.type && m.type.startsWith("image/")) {
-      div.innerHTML = `<button class="remove">×</button><img src="${m.data}" alt=""><span>${m.name}</span>`;
+      const url = URL.createObjectURL(m.blob);
+      div.innerHTML = `<button class="remove">×</button><img src="${url}" alt=""><span>${m.name}</span>`;
     } else {
       div.innerHTML = `<button class="remove">×</button><div style="height:92px;display:grid;place-items:center;font-size:2rem">📎</div><span>${m.name}</span>`;
     }
-    div.querySelector(".remove").onclick = () => {
-      mediaStore[id].splice(idx,1);
-      saveStores();
+    div.querySelector(".remove").onclick = async () => {
+      await deleteMediaFromDB(m.id);
+      mediaCache[id] = (mediaCache[id] || []).filter(x => x.id !== m.id);
       renderPreview(id);
     };
     preview.appendChild(div);
@@ -403,21 +478,32 @@ document.querySelectorAll(".tab").forEach(btn => {
 });
 searchInput.addEventListener("input", render);
 
-async function imageToDataUrlForPdf(src){
+async function blobToDataUrl(blob){
+  return new Promise(resolve => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = () => resolve(null);
+    reader.readAsDataURL(blob);
+  });
+}
+
+async function imageBlobToDataUrlForPdf(blob){
+  const dataUrl = await blobToDataUrl(blob);
+  if(!dataUrl) return null;
   return new Promise(resolve => {
     const img = new Image();
     img.onload = () => {
-      const maxW = 1000;
-      const scale = Math.min(1, maxW/img.width);
+      const maxW = 1400;
+      const scale = Math.min(1, maxW / img.width);
       const canvas = document.createElement("canvas");
-      canvas.width = img.width * scale;
-      canvas.height = img.height * scale;
+      canvas.width = Math.max(1, Math.round(img.width * scale));
+      canvas.height = Math.max(1, Math.round(img.height * scale));
       const ctx = canvas.getContext("2d");
-      ctx.drawImage(img,0,0,canvas.width,canvas.height);
-      resolve(canvas.toDataURL("image/jpeg", .82));
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      resolve(canvas.toDataURL("image/jpeg", .86));
     };
     img.onerror = () => resolve(null);
-    img.src = src;
+    img.src = dataUrl;
   });
 }
 
@@ -449,15 +535,17 @@ pdfBtn.onclick = async () => {
     addText(`Relações/guia: ${s.relations}`);
     addText(`Dica: ${s.tip}`);
     if(notesStore[s.id]) addText(`Observações: ${notesStore[s.id]}`);
-    const medias = mediaStore[s.id] || [];
+
+    const medias = mediaCache[s.id] || [];
     for(const m of medias){
       if(m.type && m.type.startsWith("image/")) {
-        const imgData = await imageToDataUrlForPdf(m.data);
+        const imgData = await imageBlobToDataUrlForPdf(m.blob);
         if(imgData){
-          if(y > pageH - 75) { pdf.addPage(); y = 16; }
-          pdf.addImage(imgData, "JPEG", margin, y, 82, 62);
-          pdf.setFontSize(8); pdf.text(m.name.slice(0,60), margin, y+66);
-          y += 72;
+          if(y > pageH - 120) { pdf.addPage(); y = 16; }
+          pdf.addImage(imgData, "JPEG", margin, y, 180, 105, undefined, "FAST");
+          pdf.setFontSize(8);
+          pdf.text((m.name || "foto").slice(0,80), margin, y + 110);
+          y += 116;
         }
       } else {
         addText(`Anexo registrado: ${m.name}`);
@@ -467,6 +555,27 @@ pdfBtn.onclick = async () => {
   }
   pdf.save("atlas-arterias-membro-inferior.pdf");
 };
+
+document.addEventListener("click", e => {
+  const img = e.target.closest(".thumb img");
+  if(img){
+    const overlay = document.createElement("div");
+    overlay.className = "zoomOverlay";
+    overlay.innerHTML = `
+      <div class="zoomBox">
+        <button id="closeZoom" class="zoomClose">×</button>
+        <img src="${img.src}" class="zoomImg">
+        <p class="zoomHint">Toque duas vezes ou use o gesto de pinça para aproximar. Arraste para ver detalhes.</p>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+    overlay.onclick = (ev)=>{
+      if(ev.target.id === "closeZoom" || ev.target === overlay){
+        overlay.remove();
+      }
+    };
+  }
+});
 
 let deferredPrompt;
 const installBtn = document.getElementById("installBtn");
@@ -487,40 +596,4 @@ if("serviceWorker" in navigator){
   window.addEventListener("load", () => navigator.serviceWorker.register("./sw.js"));
 }
 
-render();
-
-document.addEventListener("click", e => {
-  const img = e.target.closest(".thumb img");
-  if(img){
-    const overlay = document.createElement("div");
-    overlay.style.cssText = `
-      position:fixed;inset:0;background:rgba(0,0,0,.92);
-      display:flex;align-items:center;justify-content:center;
-      z-index:99999;padding:1rem;
-    `;
-    overlay.innerHTML = `
-      <div style="position:relative;width:100%;height:100%;display:flex;align-items:center;justify-content:center;overflow:auto">
-        <button id="closeZoom" style="
-          position:fixed;top:20px;right:20px;width:54px;height:54px;
-          border-radius:999px;border:0;background:#ef4444;color:white;
-          font-size:2rem;font-weight:900;cursor:pointer;z-index:2">×</button>
-        <img src="${img.src}" style="
-          width:auto;
-          height:auto;
-          max-width:95vw;
-          max-height:95vh;
-          object-fit:contain;
-          border-radius:24px;
-          box-shadow:0 25px 80px rgba(0,0,0,.6);
-          touch-action:manipulation;
-        ">
-      </div>
-    `;
-    document.body.appendChild(overlay);
-    overlay.onclick = (ev)=>{
-      if(ev.target.id === "closeZoom" || ev.target === overlay){
-        overlay.remove();
-      }
-    };
-  }
-});
+loadMediaCache().then(render);
