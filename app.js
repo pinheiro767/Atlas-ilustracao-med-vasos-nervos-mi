@@ -505,14 +505,14 @@ document.addEventListener("click", e => {
           border-radius:999px;border:0;background:#ef4444;color:white;
           font-size:2rem;font-weight:900;cursor:pointer;z-index:2">×</button>
         <img src="${img.src}" style="
-          max-width:none;
           width:auto;
           height:auto;
-          min-width:70%;
-          transform:scale(1.6);
-          transform-origin:center;
+          max-width:95vw;
+          max-height:95vh;
+          object-fit:contain;
           border-radius:24px;
           box-shadow:0 25px 80px rgba(0,0,0,.6);
+          touch-action:manipulation;
         ">
       </div>
     `;
