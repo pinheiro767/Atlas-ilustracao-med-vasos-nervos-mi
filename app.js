@@ -124,3 +124,154 @@ document.addEventListener("click", (e)=>{
   document.getElementById("zoomImg").src = img.src;
   overlay.classList.add("open");
 });
+
+
+// ZOOM AVANÇADO: AMPLIAR, ARRASTAR E PINÇA NO CELULAR
+let zoomState = {
+  scale: 1,
+  x: 0,
+  y: 0,
+  dragging: false,
+  startX: 0,
+  startY: 0,
+  lastX: 0,
+  lastY: 0,
+  pinchStart: 0,
+  startScale: 1
+};
+
+function applyZoomTransform(){
+  const img = document.getElementById("zoomImg");
+  if(!img) return;
+  img.style.transform = `translate(${zoomState.x}px, ${zoomState.y}px) scale(${zoomState.scale})`;
+}
+
+function resetZoom(){
+  zoomState.scale = 1;
+  zoomState.x = 0;
+  zoomState.y = 0;
+  applyZoomTransform();
+}
+
+function zoomIn(){
+  zoomState.scale = Math.min(5, zoomState.scale + 0.35);
+  applyZoomTransform();
+}
+
+function zoomOut(){
+  zoomState.scale = Math.max(1, zoomState.scale - 0.35);
+  if(zoomState.scale === 1){ zoomState.x = 0; zoomState.y = 0; }
+  applyZoomTransform();
+}
+
+function distanceTouches(touches){
+  const dx = touches[0].clientX - touches[1].clientX;
+  const dy = touches[0].clientY - touches[1].clientY;
+  return Math.sqrt(dx*dx + dy*dy);
+}
+
+function createAdvancedZoomOverlay(){
+  let overlay = document.getElementById("zoomOverlay");
+  if(overlay) overlay.remove();
+
+  overlay = document.createElement("div");
+  overlay.id = "zoomOverlay";
+  overlay.className = "zoomOverlay";
+  overlay.innerHTML = `
+    <button class="zoomClose" aria-label="Fechar">×</button>
+    <div class="zoomStage">
+      <img id="zoomImg" alt="Imagem ampliada">
+    </div>
+    <div class="zoomControls">
+      <button id="zoomMinus">−</button>
+      <button id="zoomReset">100%</button>
+      <button id="zoomPlus">+</button>
+    </div>
+    <div class="zoomHint">Use +/−, arraste a imagem ou use pinça com dois dedos</div>
+  `;
+  document.body.appendChild(overlay);
+
+  const img = document.getElementById("zoomImg");
+
+  overlay.querySelector(".zoomClose").onclick = () => overlay.classList.remove("open");
+  document.getElementById("zoomPlus").onclick = zoomIn;
+  document.getElementById("zoomMinus").onclick = zoomOut;
+  document.getElementById("zoomReset").onclick = resetZoom;
+
+  overlay.addEventListener("click", (e)=>{
+    if(e.target.id === "zoomOverlay") overlay.classList.remove("open");
+  });
+
+  img.addEventListener("wheel", (e)=>{
+    e.preventDefault();
+    if(e.deltaY < 0) zoomIn(); else zoomOut();
+  }, {passive:false});
+
+  img.addEventListener("mousedown", (e)=>{
+    e.preventDefault();
+    zoomState.dragging = true;
+    img.classList.add("dragging");
+    zoomState.startX = e.clientX;
+    zoomState.startY = e.clientY;
+    zoomState.lastX = zoomState.x;
+    zoomState.lastY = zoomState.y;
+  });
+
+  window.addEventListener("mousemove", (e)=>{
+    if(!zoomState.dragging) return;
+    zoomState.x = zoomState.lastX + (e.clientX - zoomState.startX);
+    zoomState.y = zoomState.lastY + (e.clientY - zoomState.startY);
+    applyZoomTransform();
+  });
+
+  window.addEventListener("mouseup", ()=>{
+    zoomState.dragging = false;
+    img.classList.remove("dragging");
+  });
+
+  img.addEventListener("touchstart", (e)=>{
+    if(e.touches.length === 1){
+      zoomState.dragging = true;
+      zoomState.startX = e.touches[0].clientX;
+      zoomState.startY = e.touches[0].clientY;
+      zoomState.lastX = zoomState.x;
+      zoomState.lastY = zoomState.y;
+    }
+    if(e.touches.length === 2){
+      zoomState.dragging = false;
+      zoomState.pinchStart = distanceTouches(e.touches);
+      zoomState.startScale = zoomState.scale;
+    }
+  }, {passive:false});
+
+  img.addEventListener("touchmove", (e)=>{
+    e.preventDefault();
+    if(e.touches.length === 1 && zoomState.dragging){
+      zoomState.x = zoomState.lastX + (e.touches[0].clientX - zoomState.startX);
+      zoomState.y = zoomState.lastY + (e.touches[0].clientY - zoomState.startY);
+      applyZoomTransform();
+    }
+    if(e.touches.length === 2){
+      const dist = distanceTouches(e.touches);
+      const ratio = dist / zoomState.pinchStart;
+      zoomState.scale = Math.max(1, Math.min(5, zoomState.startScale * ratio));
+      applyZoomTransform();
+    }
+  }, {passive:false});
+
+  img.addEventListener("touchend", ()=>{
+    zoomState.dragging = false;
+  });
+
+  return overlay;
+}
+
+document.addEventListener("click", (e)=>{
+  const imgThumb = e.target.closest(".thumb img");
+  if(!imgThumb) return;
+  e.stopPropagation();
+  const overlay = createAdvancedZoomOverlay();
+  document.getElementById("zoomImg").src = imgThumb.src;
+  resetZoom();
+  overlay.classList.add("open");
+}, true);

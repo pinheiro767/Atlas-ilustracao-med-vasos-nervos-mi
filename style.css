@@ -60,3 +60,49 @@ h1{margin:0;font-size:24px}.topbar p{margin:4px 0;color:var(--muted)}button{curs
   opacity:.85;
 }
 .thumb img{cursor:zoom-in}
+
+/* ZOOM COM MOVIMENTO, PINÇA E ARRASTAR */
+.zoomOverlay{
+  touch-action:none;
+  overflow:hidden;
+}
+.zoomStage{
+  width:100vw;
+  height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden;
+  touch-action:none;
+}
+#zoomImg{
+  max-width:96vw;
+  max-height:88vh;
+  object-fit:contain;
+  transform-origin:center center;
+  transition:transform .05s linear;
+  cursor:grab;
+  user-select:none;
+  -webkit-user-drag:none;
+}
+#zoomImg.dragging{cursor:grabbing}
+.zoomControls{
+  position:fixed;
+  left:50%;
+  transform:translateX(-50%);
+  bottom:48px;
+  display:flex;
+  gap:8px;
+  z-index:10000;
+}
+.zoomControls button{
+  background:#ffffff;
+  color:#111827;
+  border:0;
+  border-radius:14px;
+  padding:10px 14px;
+  font-weight:900;
+}
+.zoomHint{
+  bottom:10px !important;
+}
