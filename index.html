@@ -5,6 +5,7 @@
 <meta name="theme-color" content="#7c3aed">
 <title>Topográfica de MMII — Aula 1</title>
 <link rel="manifest" href="manifest.json"><link rel="stylesheet" href="style.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body>
 <header class="topbar">
@@ -12,7 +13,7 @@
   <button id="themeBtn">🌙</button>
 </header>
 <main>
-<section class="hero"><h2>Roteiro com informações ocultas</h2><p>Clique nos cards para revelar. Tire fotos, anexe arquivos e salve anotações por estrutura.</p></section>
+<section class="hero"><h2>Roteiro com informações ocultas</h2><p>Clique nos cards para revelar onde encontrar cada estrutura. Tire quantas fotos quiser, anexe arquivos e gere PDF completo.</p></section>
 <nav class="tabs">
 <button class="tab active" data-tab="regioes">Regiões</button>
 <button class="tab" data-tab="fascias">Fáscias/compartimentos</button>
@@ -22,7 +23,8 @@
 </nav>
 <section class="tools">
 <input id="search" placeholder="Pesquisar estrutura...">
-<button id="openAll">Mostrar tudo</button><button id="closeAll">Ocultar tudo</button><button id="export">Exportar dados</button>
+<button id="openAll">Mostrar tudo</button><button id="closeAll">Ocultar tudo</button>
+<button id="pdfBtn">Gerar PDF de tudo</button><button id="export">Exportar dados</button>
 </section>
 <section id="cards" class="grid"></section>
 </main>
