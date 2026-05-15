@@ -92,3 +92,35 @@ function msg(t,cl){let d=document.createElement("div");d.className=cl;d.textCont
 function ask(){let q=$("qAi").value.trim();if(!q)return;msg(q,"user");$("qAi").value="";setTimeout(()=>msg(answer(q),"bot"),200)}
 function answer(q){let t=q.toLowerCase(); if(t.includes("femoral profunda"))return "A artéria femoral profunda nasce da femoral e mergulha profundamente atrás do adutor longo."; if(t.includes("circunflexa lateral"))return "A circunflexa femoral lateral geralmente nasce da femoral profunda, passa lateralmente sob sartório e reto femoral e divide-se em ramos ascendente, transverso e descendente."; if(t.includes("circunflexa medial"))return "A circunflexa femoral medial geralmente nasce da femoral profunda e segue medial/posterior para cabeça e colo do fêmur."; if(t.includes("safena magna"))return "A safena magna sobe anterior ao maléolo medial, pela face medial da perna/coxa, e drena na femoral pelo hiato safeno."; if(t.includes("poplítea"))return "Na fossa poplítea, de superficial para profundo: nervo tibial, veia poplítea e artéria poplítea."; let all=Object.values(DATA).flat(); let f=all.find(x=>x[0].toLowerCase().includes(t)); return f?f[0]+": "+f[1]:"Pesquise pelo nome da estrutura ou pergunte de forma curta, exemplo: femoral profunda, dorsal do pé, poplítea."}
 if("serviceWorker" in navigator)navigator.serviceWorker.register("sw.js"); render();
+
+
+// ZOOM DAS FOTOS ANEXADAS
+function ensureZoomOverlay(){
+  let overlay = document.getElementById("zoomOverlay");
+  if(!overlay){
+    overlay = document.createElement("div");
+    overlay.id = "zoomOverlay";
+    overlay.className = "zoomOverlay";
+    overlay.innerHTML = `
+      <button class="zoomClose" aria-label="Fechar">×</button>
+      <img id="zoomImg" alt="Imagem ampliada">
+      <div class="zoomHint">Toque fora da imagem ou no X para fechar</div>
+    `;
+    document.body.appendChild(overlay);
+    overlay.addEventListener("click", (e)=>{
+      if(e.target.id === "zoomOverlay" || e.target.classList.contains("zoomClose")){
+        overlay.classList.remove("open");
+      }
+    });
+  }
+  return overlay;
+}
+
+document.addEventListener("click", (e)=>{
+  const img = e.target.closest(".thumb img");
+  if(!img) return;
+  e.stopPropagation();
+  const overlay = ensureZoomOverlay();
+  document.getElementById("zoomImg").src = img.src;
+  overlay.classList.add("open");
+});
