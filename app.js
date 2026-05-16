@@ -1,71 +1,77 @@
 
-const DATA = JSON.parse(document.getElementById("data-json").textContent);
-const topics = Object.keys(DATA);
-let topic = topics[0];
-let files = {};
-let notes = JSON.parse(localStorage.getItem("roteiro_notes") || "{}");
+const DATA = JSON.parse(document.getElementById("data").textContent);
+const cats = ["Regiões","Artérias","Veias","Nervos","Linfonodos"];
+let cat = "Regiões";
+let media = {};
+let notes = JSON.parse(localStorage.getItem("atlas_notes") || "{}");
 
-const tabsEl = document.getElementById("mainTabs");
-const cardsEl = document.getElementById("cards");
-const tpl = document.getElementById("cardTemplate");
+const tabs = document.getElementById("tabs");
+const cards = document.getElementById("cards");
+const tpl = document.getElementById("tpl");
 const search = document.getElementById("search");
 const groupFilter = document.getElementById("groupFilter");
 
-topics.forEach(t=>{
+cats.forEach(c=>{
   const b=document.createElement("button");
-  b.className="tab"+(t===topic?" active":"");
-  b.textContent=t;
+  b.className="tab"+(c===cat?" active":"");
+  b.textContent=c;
   b.onclick=()=>{
-    topic=t;
+    cat=c;
     document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
     b.classList.add("active");
     renderGroups();
     render();
   };
-  tabsEl.appendChild(b);
+  tabs.appendChild(b);
 });
 
 function renderGroups(){
-  const groups = ["Todos", ...new Set(DATA[topic].map(x=>x.grupo))];
+  const groups = ["Todos", ...new Set(DATA.filter(i=>i.cat===cat).map(i=>i.grupo))];
   groupFilter.innerHTML = groups.map(g=>`<option>${g}</option>`).join("");
 }
 
 function render(){
-  cardsEl.innerHTML="";
+  cards.innerHTML="";
   const q=search.value.toLowerCase();
   const g=groupFilter.value || "Todos";
-  DATA[topic].filter(item=>{
-    const okGroup = g==="Todos" || item.grupo===g;
-    const okSearch = !q || (item.titulo+" "+item.grupo).toLowerCase().includes(q);
-    return okGroup && okSearch;
-  }).forEach((item,idx)=>{
-    const key = topic+"|"+item.grupo+"|"+item.titulo;
-    const node = tpl.content.cloneNode(true);
-    node.querySelector(".group").textContent=item.grupo;
-    node.querySelector(".counter").textContent=idx+1;
-    node.querySelector("h2").textContent=item.titulo;
-    const ta=node.querySelector("textarea");
+  const arr=DATA.filter(i=>{
+    return i.cat===cat && (g==="Todos" || i.grupo===g) &&
+      (!q || (i.nome+" "+i.grupo+" "+i.localizar).toLowerCase().includes(q));
+  });
+  arr.forEach((it,idx)=>{
+    const key=it.cat+"|"+it.grupo+"|"+it.nome;
+    const n=tpl.content.cloneNode(true);
+    n.querySelector(".num").textContent=idx+1;
+    n.querySelector(".grupo").textContent=it.grupo;
+    n.querySelector("h2").textContent=it.nome;
+    n.querySelector(".loc").textContent=it.localizar;
+    n.querySelector(".inf").textContent=it.info;
+    const hidden=n.querySelector(".hiddenInfo");
+    n.querySelector(".toggle").onclick=()=>{
+      hidden.classList.toggle("open");
+      n.querySelector(".toggle").textContent = hidden.classList.contains("open") ? "🙈 Ocultar informações" : "👁️ Mostrar informações";
+    };
+    const ta=n.querySelector("textarea");
     ta.value=notes[key] || "";
-    ta.oninput=()=>{notes[key]=ta.value;localStorage.setItem("roteiro_notes",JSON.stringify(notes));};
-    const preview=node.querySelector(".preview");
-    node.querySelector(".photoInput").onchange=e=>addFiles(key,preview,e.target.files);
-    node.querySelector(".fileInput").onchange=e=>addFiles(key,preview,e.target.files);
-    cardsEl.appendChild(node);
-    drawPreview(key,preview);
+    ta.oninput=()=>{notes[key]=ta.value;localStorage.setItem("atlas_notes",JSON.stringify(notes));};
+    const prev=n.querySelector(".preview");
+    n.querySelector(".photo").onchange=e=>addFiles(key,prev,e.target.files);
+    n.querySelector(".file").onchange=e=>addFiles(key,prev,e.target.files);
+    cards.appendChild(n);
+    drawPreview(key,prev);
   });
 }
 
-function addFiles(key,preview,list){
-  files[key]=files[key] || [];
+function addFiles(key, prev, list){
+  media[key]=media[key] || [];
   [...list].forEach(f=>{
-    files[key].push({name:f.name,type:f.type,url:URL.createObjectURL(f)});
+    media[key].push({name:f.name,type:f.type,url:URL.createObjectURL(f)});
   });
-  drawPreview(key,preview);
+  drawPreview(key,prev);
 }
-
-function drawPreview(key,preview){
-  preview.innerHTML="";
-  (files[key]||[]).forEach((f,i)=>{
+function drawPreview(key,prev){
+  prev.innerHTML="";
+  (media[key]||[]).forEach((f,i)=>{
     const d=document.createElement("div");
     d.className="thumb";
     if(f.type.startsWith("image/")){
@@ -74,11 +80,10 @@ function drawPreview(key,preview){
     }else{
       d.innerHTML=`<button class="remove">×</button><div style="height:94px;display:grid;place-items:center;font-size:2rem">📎</div><span>${f.name}</span>`;
     }
-    d.querySelector(".remove").onclick=()=>{files[key].splice(i,1);drawPreview(key,preview);};
-    preview.appendChild(d);
+    d.querySelector(".remove").onclick=()=>{media[key].splice(i,1);drawPreview(key,prev);};
+    prev.appendChild(d);
   });
 }
-
 function zoom(url){
   const z=document.createElement("div");
   z.className="zoom";
@@ -87,24 +92,19 @@ function zoom(url){
   document.body.appendChild(z);
 }
 
-document.getElementById("pdfBtn").onclick=()=>window.print();
+document.getElementById("themeBtn").onclick=()=>{
+  document.body.classList.toggle("light");
+  document.getElementById("themeBtn").textContent=document.body.classList.contains("light") ? "☀️ Modo claro" : "🌙 Modo escuro";
+};
 search.oninput=render;
 groupFilter.onchange=render;
 
 let deferredPrompt;
 const installBtn=document.getElementById("installBtn");
 window.addEventListener("beforeinstallprompt",e=>{
-  e.preventDefault();
-  deferredPrompt=e;
-  installBtn.hidden=false;
+  e.preventDefault();deferredPrompt=e;installBtn.hidden=false;
 });
-installBtn.onclick=async()=>{
-  if(!deferredPrompt)return;
-  deferredPrompt.prompt();
-  await deferredPrompt.userChoice;
-  deferredPrompt=null;
-  installBtn.hidden=true;
-};
+installBtn.onclick=async()=>{if(!deferredPrompt)return;deferredPrompt.prompt();await deferredPrompt.userChoice;deferredPrompt=null;installBtn.hidden=true;};
 if("serviceWorker" in navigator) navigator.serviceWorker.register("./sw.js");
 
 renderGroups();
