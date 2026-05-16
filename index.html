@@ -1,38 +1,22 @@
-<!doctype html>
-<html lang="pt-BR">
-<head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#7c3aed">
-<title>Topográfica de MMII — Aula 1</title>
-<link rel="manifest" href="manifest.json"><link rel="stylesheet" href="style.css">
+<!doctype html><html lang="pt-BR"><head>
+<meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<meta name="theme-color" content="#07111f"/><title>Atlas PWA — Membro Inferior Completo</title>
+<link rel="manifest" href="manifest.json"/><link rel="stylesheet" href="style.css"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-</head>
-<body>
-<header class="topbar">
-  <div><h1>Topográfica de MMII</h1><p>Roteiro prático interativo • Aula 1</p></div>
-  <div class="headerActions"><button id="installBtn">📲 Baixar app</button><button id="themeBtn">🌙</button></div>
-</header>
-<main>
-<section class="hero"><h2>Roteiro com informações ocultas</h2><p>Clique nos cards para revelar onde encontrar cada estrutura. Tire quantas fotos quiser, anexe arquivos e gere PDF completo.</p></section>
-<nav class="tabs">
-<button class="tab active" data-tab="regioes">Regiões</button>
-<button class="tab" data-tab="fascias">Fáscias/compartimentos</button>
-<button class="tab" data-tab="arterias">Artérias</button>
-<button class="tab" data-tab="veias">Veias</button>
-<button class="tab" data-tab="linfonodos">Linfonodos</button>
-</nav>
-<section class="tools">
-<input id="search" placeholder="Pesquisar estrutura...">
-<button id="openAll">Mostrar tudo</button><button id="closeAll">Ocultar tudo</button>
-<button id="pdfBtn">Gerar PDF de tudo</button><button id="export">Exportar dados</button>
-</section>
-<section id="cards" class="grid"></section>
-</main>
-<button id="aiFab">🤖</button>
-<aside id="aiPanel">
-<div class="aiTop"><b>IA de dúvidas rápidas</b><button id="xAi">×</button></div>
-<div id="chat"><div class="bot">Pergunte algo curto: “onde passa a femoral profunda?”, “safena magna”, “dorsal do pé”.</div></div>
-<div class="aiInput"><input id="qAi" placeholder="Digite sua dúvida..."><button id="sendAi">Enviar</button></div>
-</aside>
-<script src="app.js"></script>
-</body></html>
+</head><body>
+<header class="hero"><div><p class="tag">PWA • Anatomia Humana • Membro inferior completo</p>
+<h1>Atlas Imersivo do Membro Inferior</h1>
+<p class="subtitle">Todas as regiões anatômicas em cards modernos: pelve/glútea, coxa, joelho, perna, dorso e planta do pé. Permite fotos, anexos, zoom e PDF final.</p></div>
+<div class="heroActions"><button id="installBtn" class="btn ghost" hidden>📲 Baixar app</button><button id="pdfBtn" class="btn primary">📄 Gerar PDF completo</button></div></header>
+<main><section class="panel"><input id="searchInput" placeholder="🔎 Buscar estrutura, músculo, nervo, artéria ou região..."/><div id="tabs" class="tabs"></div></section>
+<section class="clinical"><h2>Mapa rápido para prática</h2>
+<p><b>Pelve/glútea:</b> crista ilíaca, EIAS, EIPS e piriforme.</p><p><b>Coxa:</b> anterior = quadríceps/femoral; medial = adutores/obturatório; posterior = isquiotibiais/isquiático.</p>
+<p><b>Joelho:</b> anterior = patela; posterior = fossa poplítea com NVA.</p><p><b>Perna:</b> anterior = dorsiflexores; lateral = fibulares; posterior = tríceps sural/tibial posterior.</p>
+<p><b>Pé:</b> dorso = dorsal do pé/extensores; planta = plantares/arco plantar/fáscia plantar.</p></section>
+<section id="cards" class="grid"></section></main>
+<template id="cardTemplate"><article class="card"><div class="cardTop"><span class="number"></span><span class="region"></span></div><h3></h3><div class="info"></div>
+<div class="tools"><label class="fileBtn">📷 Tirar fotos<input class="cameraInput" type="file" accept="image/*" capture="environment" multiple></label>
+<label class="fileBtn">📎 Incluir arquivos/fotos<input class="fileInput" type="file" accept="image/*,.pdf,.doc,.docx,.ppt,.pptx" multiple></label></div>
+<textarea class="notes" placeholder="Observações, identificação na peça, correlação clínica..."></textarea><div class="preview"></div></article></template>
+<footer><p>Base didática: Moore, Gray’s Anatomy for Students, Netter e atlas anatômicos/vasculares contemporâneos. Uso educacional em laboratório.</p></footer>
+<script src="app.js"></script></body></html>

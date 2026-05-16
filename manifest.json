@@ -1,24 +1,20 @@
 {
-  "name": "Topográfica de MMII Aula 1",
-  "short_name": "MMII Aula 1",
+  "name": "Atlas Imersivo do Membro Inferior Completo",
+  "short_name": "Membro Inferior",
   "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#020617",
-  "theme_color": "#7c3aed",
+  "background_color": "#06101f",
+  "theme_color": "#07111f",
   "icons": [
     {
       "src": "icons/icon-192.png",
       "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any maskable"
+      "type": "image/png"
     },
     {
       "src": "icons/icon-512.png",
       "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
+      "type": "image/png"
     }
-  ],
-  "id": "/PWA_Topografica_MMII_Aula1/",
-  "scope": "./"
+  ]
 }
