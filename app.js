@@ -1,23 +1,111 @@
-const STRUCTURES = [{"id": 1, "region": "Região glútea e pelve", "name": "Crista ilíaca", "where": "Limite ósseo superior da pelve, palpável lateralmente.", "tip": "Guia para orientação da pelve e região glútea."}, {"id": 2, "region": "Região glútea e pelve", "name": "EIAS", "where": "Espinha ilíaca anterossuperior, referência anterior da pelve.", "tip": "Marco do ligamento inguinal e origem do sartório."}, {"id": 3, "region": "Região glútea e pelve", "name": "EIPS", "where": "Espinha ilíaca posterossuperior, referência posterior da pelve.", "tip": "Ajuda a localizar sacro e articulação sacroilíaca."}, {"id": 4, "region": "Região glútea e pelve", "name": "Ligamento inguinal", "where": "Da EIAS ao tubérculo púbico.", "tip": "Marco onde a ilíaca externa continua como femoral."}, {"id": 5, "region": "Região glútea e pelve", "name": "Glúteo máximo", "where": "Camada superficial da região glútea.", "tip": "Extensão do quadril; referência para região glútea inferior."}, {"id": 6, "region": "Região glútea e pelve", "name": "Glúteo médio", "where": "Lateral da pelve, parcialmente profundo ao glúteo máximo.", "tip": "Abdução e estabilização da pelve na marcha."}, {"id": 7, "region": "Região glútea e pelve", "name": "Glúteo mínimo", "where": "Profundo ao glúteo médio.", "tip": "Estabilização do quadril."}, {"id": 8, "region": "Região glútea e pelve", "name": "Piriforme", "where": "Do sacro ao trocânter maior.", "tip": "Marco para vasos/nervos glúteos e nervo isquiático."}, {"id": 9, "region": "Região glútea e pelve", "name": "Nervo isquiático", "where": "Geralmente sai abaixo do piriforme.", "tip": "Maior nervo do corpo; segue para coxa posterior."}, {"id": 10, "region": "Região glútea e pelve", "name": "Artéria glútea superior", "where": "Sai acima do piriforme.", "tip": "Acompanha nervo glúteo superior."}, {"id": 11, "region": "Região glútea e pelve", "name": "Artéria glútea inferior", "where": "Sai abaixo do piriforme.", "tip": "Relaciona-se ao glúteo máximo."}, {"id": 12, "region": "Região glútea e pelve", "name": "Artéria obturatória", "where": "Passa pelo canal obturatório.", "tip": "Importante para pelve e região medial da coxa."}, {"id": 13, "region": "Coxa anterior e trígono femoral", "name": "Trígono femoral", "where": "Logo abaixo do ligamento inguinal.", "tip": "Contém nervo femoral, artéria femoral e veia femoral."}, {"id": 14, "region": "Coxa anterior e trígono femoral", "name": "Artéria femoral", "where": "Abaixo do ligamento inguinal.", "tip": "Pulso femoral entre EIAS e sínfise púbica."}, {"id": 15, "region": "Coxa anterior e trígono femoral", "name": "Veia femoral", "where": "Medial à artéria femoral.", "tip": "Relação clássica no trígono femoral."}, {"id": 16, "region": "Coxa anterior e trígono femoral", "name": "Nervo femoral", "where": "Lateral à artéria femoral.", "tip": "Inerva compartimento anterior da coxa."}, {"id": 17, "region": "Coxa anterior e trígono femoral", "name": "Sartório", "where": "Da EIAS à tíbia medial.", "tip": "Limite lateral do trígono femoral e componente da pata de ganso."}, {"id": 18, "region": "Coxa anterior e trígono femoral", "name": "Iliopsoas", "where": "Profundo ao ligamento inguinal.", "tip": "Principal flexor do quadril."}, {"id": 19, "region": "Coxa anterior e trígono femoral", "name": "Pectíneo", "where": "Assoalho medial do trígono femoral.", "tip": "Referência para circunflexa femoral medial."}, {"id": 20, "region": "Coxa anterior e trígono femoral", "name": "Reto femoral", "where": "Músculo anterior superficial do quadríceps.", "tip": "Flexiona quadril e estende joelho."}, {"id": 21, "region": "Coxa anterior e trígono femoral", "name": "Vasto medial", "where": "Porção medial do quadríceps.", "tip": "Estabiliza a patela medialmente."}, {"id": 22, "region": "Coxa anterior e trígono femoral", "name": "Vasto lateral", "where": "Porção lateral do quadríceps.", "tip": "Relacionado ao ramo descendente da circunflexa femoral lateral."}, {"id": 23, "region": "Coxa anterior e trígono femoral", "name": "Vasto intermédio", "where": "Profundo ao reto femoral.", "tip": "Extensor do joelho."}, {"id": 24, "region": "Coxa anterior e trígono femoral", "name": "Femoral profunda", "where": "Ramo profundo da femoral.", "tip": "Principal artéria profunda da coxa."}, {"id": 25, "region": "Coxa anterior e trígono femoral", "name": "Circunflexa femoral medial", "where": "Ramo geralmente da femoral profunda.", "tip": "Irrigação da cabeça e colo do fêmur."}, {"id": 26, "region": "Coxa anterior e trígono femoral", "name": "Circunflexa femoral lateral", "where": "Ramo lateral da femoral profunda.", "tip": "Passa profundamente ao sartório/reto femoral."}, {"id": 27, "region": "Coxa medial", "name": "Adutor longo", "where": "Músculo superficial medial da coxa.", "tip": "Referência para a femoral profunda."}, {"id": 28, "region": "Coxa medial", "name": "Adutor curto", "where": "Profundo ao adutor longo.", "tip": "Adução do quadril."}, {"id": 29, "region": "Coxa medial", "name": "Adutor magno", "where": "Grande músculo medial/posterior.", "tip": "Forma o hiato do adutor."}, {"id": 30, "region": "Coxa medial", "name": "Grácil", "where": "Músculo medial superficial.", "tip": "Componente da pata de ganso."}, {"id": 31, "region": "Coxa medial", "name": "Obturador externo", "where": "Próximo ao forame obturado.", "tip": "Rotador lateral do quadril."}, {"id": 32, "region": "Coxa medial", "name": "Nervo obturatório", "where": "Passa pelo canal obturatório.", "tip": "Inerva compartimento medial da coxa."}, {"id": 33, "region": "Coxa medial", "name": "Canal dos adutores", "where": "Entre vasto medial, sartório e adutores.", "tip": "Conduz vasos femorais."}, {"id": 34, "region": "Coxa medial", "name": "Hiato do adutor", "where": "Abertura no adutor magno.", "tip": "Femoral passa e continua como poplítea."}, {"id": 35, "region": "Coxa posterior", "name": "Bíceps femoral cabeça longa", "where": "Posterolateral da coxa.", "tip": "Flexão do joelho e extensão do quadril."}, {"id": 36, "region": "Coxa posterior", "name": "Bíceps femoral cabeça curta", "where": "Posterolateral, origem femoral.", "tip": "Flexão do joelho."}, {"id": 37, "region": "Coxa posterior", "name": "Semitendíneo", "where": "Posteromedial superficial.", "tip": "Componente da pata de ganso."}, {"id": 38, "region": "Coxa posterior", "name": "Semimembranáceo", "where": "Posteromedial profundo.", "tip": "Relaciona-se à região posterior do joelho."}, {"id": 39, "region": "Coxa posterior", "name": "Nervo isquiático na coxa", "where": "Profundo na coxa posterior.", "tip": "Divide-se em tibial e fibular comum."}, {"id": 40, "region": "Coxa posterior", "name": "Artérias perfurantes", "where": "Ramos da femoral profunda.", "tip": "Irrigam coxa posterior."}, {"id": 41, "region": "Joelho e fossa poplítea", "name": "Patela", "where": "Osso sesamoide anterior do joelho.", "tip": "Aumenta a força do quadríceps."}, {"id": 42, "region": "Joelho e fossa poplítea", "name": "Ligamento patelar", "where": "Da patela à tuberosidade da tíbia.", "tip": "Continuação do tendão do quadríceps."}, {"id": 43, "region": "Joelho e fossa poplítea", "name": "Fossa poplítea", "where": "Região posterior do joelho.", "tip": "Contém nervo tibial, veia poplítea e artéria poplítea."}, {"id": 44, "region": "Joelho e fossa poplítea", "name": "Artéria poplítea", "where": "Profunda na fossa poplítea.", "tip": "Continuação da femoral."}, {"id": 45, "region": "Joelho e fossa poplítea", "name": "Veia poplítea", "where": "Entre nervo tibial e artéria poplítea.", "tip": "Drenagem profunda da perna."}, {"id": 46, "region": "Joelho e fossa poplítea", "name": "Nervo tibial", "where": "Mais superficial na fossa poplítea.", "tip": "Continuação medial do isquiático."}, {"id": 47, "region": "Joelho e fossa poplítea", "name": "Nervo fibular comum", "where": "Segue lateralmente ao colo da fíbula.", "tip": "Lesão pode causar pé caído."}, {"id": 48, "region": "Joelho e fossa poplítea", "name": "Artérias geniculares", "where": "Rede arterial periarticular.", "tip": "Irrigam joelho e cápsula articular."}, {"id": 49, "region": "Joelho e fossa poplítea", "name": "Menisco medial", "where": "Fibrocartilagem medial.", "tip": "Mais fixo e mais lesionado."}, {"id": 50, "region": "Joelho e fossa poplítea", "name": "Menisco lateral", "where": "Fibrocartilagem lateral.", "tip": "Mais móvel."}, {"id": 51, "region": "Joelho e fossa poplítea", "name": "Ligamento cruzado anterior", "where": "Dentro da articulação do joelho.", "tip": "Impede translação anterior da tíbia."}, {"id": 52, "region": "Joelho e fossa poplítea", "name": "Ligamento cruzado posterior", "where": "Dentro da articulação do joelho.", "tip": "Impede translação posterior da tíbia."}, {"id": 53, "region": "Perna anterior", "name": "Tíbia", "where": "Osso medial da perna.", "tip": "Referência palpável anterior/medial."}, {"id": 54, "region": "Perna anterior", "name": "Fíbula", "where": "Osso lateral da perna.", "tip": "Referência para compartimento lateral."}, {"id": 55, "region": "Perna anterior", "name": "Membrana interóssea", "where": "Entre tíbia e fíbula.", "tip": "Passagem da tibial anterior."}, {"id": 56, "region": "Perna anterior", "name": "Tibial anterior músculo", "where": "Compartimento anterior.", "tip": "Dorsiflexão e inversão."}, {"id": 57, "region": "Perna anterior", "name": "Extensor longo dos dedos", "where": "Compartimento anterior.", "tip": "Extensão dos dedos."}, {"id": 58, "region": "Perna anterior", "name": "Extensor longo do hálux", "where": "Entre tibial anterior e extensor dos dedos.", "tip": "Extensão do hálux."}, {"id": 59, "region": "Perna anterior", "name": "Fibular terceiro", "where": "Porção distal anterior/lateral.", "tip": "Dorsiflexão e eversão."}, {"id": 60, "region": "Perna anterior", "name": "Artéria tibial anterior", "where": "Perfura membrana interóssea.", "tip": "Continua como dorsal do pé."}, {"id": 61, "region": "Perna anterior", "name": "Nervo fibular profundo", "where": "Compartimento anterior.", "tip": "Inerva dorsiflexores."}, {"id": 62, "region": "Perna lateral", "name": "Fibular longo", "where": "Compartimento lateral.", "tip": "Eversão e suporte do arco plantar."}, {"id": 63, "region": "Perna lateral", "name": "Fibular curto", "where": "Profundo ao fibular longo.", "tip": "Eversão do pé."}, {"id": 64, "region": "Perna lateral", "name": "Nervo fibular superficial", "where": "Compartimento lateral.", "tip": "Sensibilidade do dorso do pé."}, {"id": 65, "region": "Perna lateral", "name": "Artéria fibular", "where": "Ramo da tibial posterior.", "tip": "Corre próxima à fíbula."}, {"id": 66, "region": "Perna posterior", "name": "Gastrocnêmio medial", "where": "Cabeça medial da panturrilha.", "tip": "Flexão plantar."}, {"id": 67, "region": "Perna posterior", "name": "Gastrocnêmio lateral", "where": "Cabeça lateral da panturrilha.", "tip": "Flexão plantar."}, {"id": 68, "region": "Perna posterior", "name": "Sóleo", "where": "Profundo ao gastrocnêmio.", "tip": "Flexão plantar postural."}, {"id": 69, "region": "Perna posterior", "name": "Tendão calcâneo", "where": "Tendão comum do tríceps sural.", "tip": "Insere no calcâneo."}, {"id": 70, "region": "Perna posterior", "name": "Poplíteo", "where": "Posterior proximal da tíbia.", "tip": "Desbloqueia o joelho."}, {"id": 71, "region": "Perna posterior", "name": "Tibial posterior músculo", "where": "Compartimento posterior profundo.", "tip": "Inversão e suporte do arco medial."}, {"id": 72, "region": "Perna posterior", "name": "Flexor longo dos dedos", "where": "Posterior profundo.", "tip": "Flexão dos dedos laterais."}, {"id": 73, "region": "Perna posterior", "name": "Flexor longo do hálux", "where": "Posterior profundo lateral.", "tip": "Flexão do hálux."}, {"id": 74, "region": "Perna posterior", "name": "Artéria tibial posterior", "where": "Atrás do maléolo medial.", "tip": "Origina artérias plantares."}, {"id": 75, "region": "Perna posterior", "name": "Nervo tibial na perna", "where": "Compartimento posterior.", "tip": "Passa no túnel do tarso."}, {"id": 76, "region": "Dorso do pé", "name": "Artéria dorsal do pé", "where": "Continuação da tibial anterior.", "tip": "Pulso dorsal do pé."}, {"id": 77, "region": "Dorso do pé", "name": "Tarsal lateral", "where": "Ramo lateral da dorsal do pé.", "tip": "Irriga dorso lateral."}, {"id": 78, "region": "Dorso do pé", "name": "Artéria arqueada", "where": "Base dos metatarsos.", "tip": "Origina metatarsais dorsais."}, {"id": 79, "region": "Dorso do pé", "name": "Metatarsais dorsais", "where": "Entre metatarsos dorsais.", "tip": "Originam digitais dorsais."}, {"id": 80, "region": "Dorso do pé", "name": "Digitais dorsais", "where": "Margens dorsais dos dedos.", "tip": "Irrigação terminal dorsal."}, {"id": 81, "region": "Dorso do pé", "name": "Extensor curto dos dedos", "where": "Dorso do pé.", "tip": "Extensão dos dedos."}, {"id": 82, "region": "Dorso do pé", "name": "Extensor curto do hálux", "where": "Dorso medial.", "tip": "Extensão do hálux."}, {"id": 83, "region": "Dorso do pé", "name": "Nervo fibular profundo no pé", "where": "Primeiro espaço interdigital.", "tip": "Marco clínico sensitivo."}, {"id": 84, "region": "Dorso do pé", "name": "Nervo fibular superficial no pé", "where": "Maior parte do dorso do pé.", "tip": "Ramos cutâneos dorsais."}, {"id": 85, "region": "Planta do pé", "name": "Artéria plantar medial", "where": "Ramo terminal menor da tibial posterior.", "tip": "Face medial da planta."}, {"id": 86, "region": "Planta do pé", "name": "Artéria plantar lateral", "where": "Ramo terminal maior da tibial posterior.", "tip": "Forma arco plantar profundo."}, {"id": 87, "region": "Planta do pé", "name": "Arco plantar profundo", "where": "Profundo aos tendões flexores.", "tip": "Base arterial profunda da planta."}, {"id": 88, "region": "Planta do pé", "name": "Metatarsais plantares", "where": "Entre metatarsos plantares.", "tip": "Ramos do arco plantar."}, {"id": 89, "region": "Planta do pé", "name": "Digitais plantares comuns", "where": "Antes da divisão digital.", "tip": "Seguem para espaços interdigitais."}, {"id": 90, "region": "Planta do pé", "name": "Digitais plantares próprias", "where": "Margens plantares dos dedos.", "tip": "Irrigação terminal plantar."}, {"id": 91, "region": "Planta do pé", "name": "Fáscia plantar", "where": "Aponeurose forte na planta.", "tip": "Suporte do arco longitudinal."}, {"id": 92, "region": "Planta do pé", "name": "Abdutor do hálux", "where": "Camada superficial medial.", "tip": "Referência medial plantar."}, {"id": 93, "region": "Planta do pé", "name": "Flexor curto dos dedos", "where": "Camada superficial central.", "tip": "Flexão dos dedos laterais."}, {"id": 94, "region": "Planta do pé", "name": "Abdutor do dedo mínimo", "where": "Camada superficial lateral.", "tip": "Referência lateral plantar."}, {"id": 95, "region": "Planta do pé", "name": "Nervo plantar medial", "where": "Ramo do tibial.", "tip": "Distribuição semelhante ao mediano."}, {"id": 96, "region": "Planta do pé", "name": "Nervo plantar lateral", "where": "Ramo do tibial.", "tip": "Distribuição semelhante ao ulnar."}];
-const REGIONS = ["Todas", ...new Set(STRUCTURES.map(s => s.region))];
-let currentRegion="Todas", mediaCache={};
-const cardsEl=document.getElementById("cards"), template=document.getElementById("cardTemplate"), searchInput=document.getElementById("searchInput"), pdfBtn=document.getElementById("pdfBtn"), tabsEl=document.getElementById("tabs");
-let notesStore=JSON.parse(localStorage.getItem("mi_completo_notes")||"{}");
-const DB_NAME="MembroInferiorCompletoDB", DB_VERSION=1, STORE_NAME="media";
-function openDB(){return new Promise((resolve,reject)=>{const r=indexedDB.open(DB_NAME,DB_VERSION);r.onupgradeneeded=e=>{const db=e.target.result;if(!db.objectStoreNames.contains(STORE_NAME))db.createObjectStore(STORE_NAME,{keyPath:"id",autoIncrement:true}).createIndex("structureId","structureId",{unique:false});};r.onsuccess=()=>resolve(r.result);r.onerror=()=>reject(r.error);});}
-async function addMediaToDB(item){const db=await openDB();return new Promise((resolve,reject)=>{const r=db.transaction(STORE_NAME,"readwrite").objectStore(STORE_NAME).add(item);r.onsuccess=()=>resolve(r.result);r.onerror=()=>reject(r.error);});}
-async function getAllMediaFromDB(){const db=await openDB();return new Promise((resolve,reject)=>{const r=db.transaction(STORE_NAME,"readonly").objectStore(STORE_NAME).getAll();r.onsuccess=()=>resolve(r.result||[]);r.onerror=()=>reject(r.error);});}
-async function deleteMediaFromDB(id){const db=await openDB();return new Promise((resolve,reject)=>{const r=db.transaction(STORE_NAME,"readwrite").objectStore(STORE_NAME).delete(id);r.onsuccess=()=>resolve();r.onerror=()=>reject(r.error);});}
-async function loadMediaCache(){const all=await getAllMediaFromDB();mediaCache={};all.forEach(m=>{mediaCache[m.structureId]=mediaCache[m.structureId]||[];mediaCache[m.structureId].push(m);});}
-function saveNotes(){localStorage.setItem("mi_completo_notes",JSON.stringify(notesStore));}
-function renderTabs(){tabsEl.innerHTML="";REGIONS.forEach(r=>{const b=document.createElement("button");b.className="tab"+(r===currentRegion?" active":"");b.textContent=r;b.onclick=()=>{currentRegion=r;renderTabs();render();};tabsEl.appendChild(b);});}
-function render(){cardsEl.innerHTML="";const q=searchInput.value.toLowerCase().trim();STRUCTURES.filter(s=>{const by=currentRegion==="Todas"||s.region===currentRegion;const txt=`${s.name} ${s.region} ${s.where} ${s.tip}`.toLowerCase();return by&&(!q||txt.includes(q));}).forEach(s=>{const node=template.content.cloneNode(true), card=node.querySelector(".card");card.dataset.id=s.id;node.querySelector(".number").textContent=s.id;node.querySelector(".region").textContent=s.region;node.querySelector("h3").textContent=s.name;node.querySelector(".info").innerHTML=`<p><b>📍 Onde encontrar/identificar:</b> ${s.where}</p><p><b>💡 Importância anatômica/clínica:</b> ${s.tip}</p>`;const notes=node.querySelector(".notes");notes.value=notesStore[s.id]||"";notes.addEventListener("input",e=>{notesStore[s.id]=e.target.value;saveNotes();});node.querySelector(".cameraInput").addEventListener("change",e=>addFiles(s.id,e.target.files));node.querySelector(".fileInput").addEventListener("change",e=>addFiles(s.id,e.target.files));cardsEl.appendChild(node);renderPreview(s.id);});}
-async function addFiles(structureId,files){for(const file of [...files]){try{const item={structureId:Number(structureId),name:file.name||"foto.jpg",type:file.type||"image/jpeg",blob:file,date:new Date().toLocaleString("pt-BR")};const id=await addMediaToDB(item);item.id=id;mediaCache[structureId]=mediaCache[structureId]||[];mediaCache[structureId].push(item);renderPreview(structureId);}catch(err){alert("Não foi possível salvar. Verifique espaço do aparelho ou permissões do navegador.");console.error(err);}}}
-function renderPreview(id){const card=document.querySelector(`.card[data-id="${id}"]`);if(!card)return;const preview=card.querySelector(".preview");preview.innerHTML="";(mediaCache[id]||[]).forEach(m=>{const div=document.createElement("div");div.className="thumb";if(m.type&&m.type.startsWith("image/")){const url=URL.createObjectURL(m.blob);div.innerHTML=`<button class="remove">×</button><img src="${url}" alt=""><span>${m.name}</span>`;}else div.innerHTML=`<button class="remove">×</button><div style="height:92px;display:grid;place-items:center;font-size:2rem">📎</div><span>${m.name}</span>`;div.querySelector(".remove").onclick=async()=>{await deleteMediaFromDB(m.id);mediaCache[id]=(mediaCache[id]||[]).filter(x=>x.id!==m.id);renderPreview(id);};preview.appendChild(div);});}
-async function blobToDataUrl(blob){return new Promise(resolve=>{const reader=new FileReader();reader.onload=()=>resolve(reader.result);reader.onerror=()=>resolve(null);reader.readAsDataURL(blob);});}
-async function imageBlobToDataUrlForPdf(blob){const dataUrl=await blobToDataUrl(blob);if(!dataUrl)return null;return new Promise(resolve=>{const img=new Image();img.onload=()=>{const maxW=1400,scale=Math.min(1,maxW/img.width),canvas=document.createElement("canvas");canvas.width=Math.max(1,Math.round(img.width*scale));canvas.height=Math.max(1,Math.round(img.height*scale));canvas.getContext("2d").drawImage(img,0,0,canvas.width,canvas.height);resolve(canvas.toDataURL("image/jpeg",.86));};img.onerror=()=>resolve(null);img.src=dataUrl;});}
-pdfBtn.onclick=async()=>{const {jsPDF}=window.jspdf,pdf=new jsPDF("p","mm","a4");const pageW=210,pageH=297,margin=12;let y=16;function addText(text,size=11,bold=false){pdf.setFont("helvetica",bold?"bold":"normal");pdf.setFontSize(size);pdf.splitTextToSize(text,pageW-margin*2).forEach(line=>{if(y>pageH-18){pdf.addPage();y=16;}pdf.text(line,margin,y);y+=size*.45+2;});}addText("Atlas Imersivo — Membro Inferior Completo",18,true);addText("PDF com regiões anatômicas, observações, fotos e anexos registrados no PWA.",10);y+=4;for(const s of STRUCTURES){if(y>pageH-45){pdf.addPage();y=16;}addText(`${s.id}. ${s.name} — ${s.region}`,14,true);addText(`Onde identificar: ${s.where}`);addText(`Importância: ${s.tip}`);if(notesStore[s.id])addText(`Observações: ${notesStore[s.id]}`);for(const m of (mediaCache[s.id]||[])){if(m.type&&m.type.startsWith("image/")){const imgData=await imageBlobToDataUrlForPdf(m.blob);if(imgData){if(y>pageH-120){pdf.addPage();y=16;}pdf.addImage(imgData,"JPEG",margin,y,180,105,undefined,"FAST");pdf.setFontSize(8);pdf.text((m.name||"foto").slice(0,80),margin,y+110);y+=116;}}else addText(`Anexo registrado: ${m.name}`);}y+=4;}pdf.save("atlas-membro-inferior-completo.pdf");};
-document.addEventListener("click",e=>{const img=e.target.closest(".thumb img");if(img){const overlay=document.createElement("div");overlay.className="zoomOverlay";overlay.innerHTML=`<div class="zoomBox"><button id="closeZoom" class="zoomClose">×</button><img src="${img.src}" class="zoomImg"><p class="zoomHint">Imagem inteira. Use pinça/zoom do aparelho para aproximar.</p></div>`;document.body.appendChild(overlay);overlay.onclick=ev=>{if(ev.target.id==="closeZoom"||ev.target===overlay)overlay.remove();};}});
-let deferredPrompt;const installBtn=document.getElementById("installBtn");window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();deferredPrompt=e;installBtn.hidden=false;});installBtn.onclick=async()=>{if(!deferredPrompt)return;deferredPrompt.prompt();await deferredPrompt.userChoice;deferredPrompt=null;installBtn.hidden=true;};
-if("serviceWorker"in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js"));
-searchInput.addEventListener("input",render);renderTabs();loadMediaCache().then(render);
+
+const DATA = JSON.parse(document.getElementById("data-json").textContent);
+const topics = Object.keys(DATA);
+let topic = topics[0];
+let files = {};
+let notes = JSON.parse(localStorage.getItem("roteiro_notes") || "{}");
+
+const tabsEl = document.getElementById("mainTabs");
+const cardsEl = document.getElementById("cards");
+const tpl = document.getElementById("cardTemplate");
+const search = document.getElementById("search");
+const groupFilter = document.getElementById("groupFilter");
+
+topics.forEach(t=>{
+  const b=document.createElement("button");
+  b.className="tab"+(t===topic?" active":"");
+  b.textContent=t;
+  b.onclick=()=>{
+    topic=t;
+    document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
+    b.classList.add("active");
+    renderGroups();
+    render();
+  };
+  tabsEl.appendChild(b);
+});
+
+function renderGroups(){
+  const groups = ["Todos", ...new Set(DATA[topic].map(x=>x.grupo))];
+  groupFilter.innerHTML = groups.map(g=>`<option>${g}</option>`).join("");
+}
+
+function render(){
+  cardsEl.innerHTML="";
+  const q=search.value.toLowerCase();
+  const g=groupFilter.value || "Todos";
+  DATA[topic].filter(item=>{
+    const okGroup = g==="Todos" || item.grupo===g;
+    const okSearch = !q || (item.titulo+" "+item.grupo).toLowerCase().includes(q);
+    return okGroup && okSearch;
+  }).forEach((item,idx)=>{
+    const key = topic+"|"+item.grupo+"|"+item.titulo;
+    const node = tpl.content.cloneNode(true);
+    node.querySelector(".group").textContent=item.grupo;
+    node.querySelector(".counter").textContent=idx+1;
+    node.querySelector("h2").textContent=item.titulo;
+    const ta=node.querySelector("textarea");
+    ta.value=notes[key] || "";
+    ta.oninput=()=>{notes[key]=ta.value;localStorage.setItem("roteiro_notes",JSON.stringify(notes));};
+    const preview=node.querySelector(".preview");
+    node.querySelector(".photoInput").onchange=e=>addFiles(key,preview,e.target.files);
+    node.querySelector(".fileInput").onchange=e=>addFiles(key,preview,e.target.files);
+    cardsEl.appendChild(node);
+    drawPreview(key,preview);
+  });
+}
+
+function addFiles(key,preview,list){
+  files[key]=files[key] || [];
+  [...list].forEach(f=>{
+    files[key].push({name:f.name,type:f.type,url:URL.createObjectURL(f)});
+  });
+  drawPreview(key,preview);
+}
+
+function drawPreview(key,preview){
+  preview.innerHTML="";
+  (files[key]||[]).forEach((f,i)=>{
+    const d=document.createElement("div");
+    d.className="thumb";
+    if(f.type.startsWith("image/")){
+      d.innerHTML=`<button class="remove">×</button><img src="${f.url}"><span>${f.name}</span>`;
+      d.querySelector("img").onclick=()=>zoom(f.url);
+    }else{
+      d.innerHTML=`<button class="remove">×</button><div style="height:94px;display:grid;place-items:center;font-size:2rem">📎</div><span>${f.name}</span>`;
+    }
+    d.querySelector(".remove").onclick=()=>{files[key].splice(i,1);drawPreview(key,preview);};
+    preview.appendChild(d);
+  });
+}
+
+function zoom(url){
+  const z=document.createElement("div");
+  z.className="zoom";
+  z.innerHTML=`<button>×</button><img src="${url}">`;
+  z.onclick=e=>{if(e.target===z || e.target.tagName==="BUTTON") z.remove();};
+  document.body.appendChild(z);
+}
+
+document.getElementById("pdfBtn").onclick=()=>window.print();
+search.oninput=render;
+groupFilter.onchange=render;
+
+let deferredPrompt;
+const installBtn=document.getElementById("installBtn");
+window.addEventListener("beforeinstallprompt",e=>{
+  e.preventDefault();
+  deferredPrompt=e;
+  installBtn.hidden=false;
+});
+installBtn.onclick=async()=>{
+  if(!deferredPrompt)return;
+  deferredPrompt.prompt();
+  await deferredPrompt.userChoice;
+  deferredPrompt=null;
+  installBtn.hidden=true;
+};
+if("serviceWorker" in navigator) navigator.serviceWorker.register("./sw.js");
+
+renderGroups();
+render();

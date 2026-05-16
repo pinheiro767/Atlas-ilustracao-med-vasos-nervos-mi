@@ -1,10 +1,10 @@
 {
-  "name": "Atlas Imersivo do Membro Inferior Completo",
-  "short_name": "Membro Inferior",
+  "name": "Atlas Topográfico Imersivo",
+  "short_name": "Topográfico",
   "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#06101f",
-  "theme_color": "#07111f",
+  "background_color": "#020617",
+  "theme_color": "#020617",
   "icons": [
     {
       "src": "icons/icon-192.png",
