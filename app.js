@@ -1,72 +1,277 @@
 
-const DATA = JSON.parse(document.getElementById("data").textContent);
-let media = {};
-let notes = JSON.parse(localStorage.getItem("roteiro_exato_notes") || "{}");
-const cards = document.getElementById("cards");
-const tpl = document.getElementById("tpl");
-const search = document.getElementById("search");
+// INSTALAÇÃO DO PWA
+let deferredPrompt = null;
+const installBtn = document.getElementById("installBtn");
 
-function render(){
-  cards.innerHTML="";
-  const q=search.value.toLowerCase();
-  DATA.filter(i=>!q || (i.nome+" "+i.onde+" "+i.localizar).toLowerCase().includes(q)).forEach(it=>{
-    const key=it.numero+"|"+it.nome;
-    const n=tpl.content.cloneNode(true);
-    n.querySelector(".num").textContent=it.numero;
-    n.querySelector("h2").textContent=it.nome;
-    n.querySelector(".onde").textContent=it.onde;
-    n.querySelector(".loc").textContent=it.localizar;
-    const info=n.querySelector(".info");
-    n.querySelector(".toggle").onclick=()=>{
-      info.classList.toggle("open");
-      n.querySelector(".toggle").textContent=info.classList.contains("open")?"🙈 Ocultar informações":"👁️ Mostrar informações";
-    };
-    const ta=n.querySelector("textarea");
-    ta.value=notes[key]||"";
-    ta.oninput=()=>{notes[key]=ta.value;localStorage.setItem("roteiro_exato_notes",JSON.stringify(notes));};
-    const prev=n.querySelector(".preview");
-    n.querySelector(".photo").onchange=e=>addFiles(key,prev,e.target.files);
-    n.querySelector(".file").onchange=e=>addFiles(key,prev,e.target.files);
-    cards.appendChild(n);
-    drawPreview(key,prev);
-  });
-}
-function addFiles(key,prev,list){
-  media[key]=media[key]||[];
-  [...list].forEach(f=>media[key].push({name:f.name,type:f.type,url:URL.createObjectURL(f)}));
-  drawPreview(key,prev);
-}
-function drawPreview(key,prev){
-  prev.innerHTML="";
-  (media[key]||[]).forEach((f,i)=>{
-    const d=document.createElement("div");
-    d.className="thumb";
-    if(f.type.startsWith("image/")){
-      d.innerHTML=`<button class="remove">×</button><img src="${f.url}"><span>${f.name}</span>`;
-      d.querySelector("img").onclick=()=>zoom(f.url);
-    }else{
-      d.innerHTML=`<button class="remove">×</button><div style="height:94px;display:grid;place-items:center;font-size:2rem">📎</div><span>${f.name}</span>`;
+window.addEventListener("beforeinstallprompt", (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  if (installBtn) installBtn.classList.remove("hidden");
+});
+
+if (installBtn) {
+  installBtn.addEventListener("click", async () => {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      await deferredPrompt.userChoice;
+      deferredPrompt = null;
+      return;
     }
-    d.querySelector(".remove").onclick=()=>{media[key].splice(i,1);drawPreview(key,prev);};
-    prev.appendChild(d);
+
+    const hint = document.createElement("div");
+    hint.className = "installHint show";
+    hint.innerHTML = `
+      <b>Para instalar no celular:</b>
+      No Chrome/Android: toque nos três pontinhos ⋮ e escolha <b>Adicionar à tela inicial</b> ou <b>Instalar app</b>.<br><br>
+      No iPhone/Safari: toque em Compartilhar e depois <b>Adicionar à Tela de Início</b>.<br><br>
+      Importante: o PWA precisa estar publicado em HTTPS, por exemplo no GitHub Pages, para aparecer como aplicativo.
+      <button onclick="this.parentElement.remove()">Entendi</button>
+    `;
+    document.body.appendChild(hint);
   });
 }
-function zoom(url){
-  const z=document.createElement("div");
-  z.className="zoom";
-  z.innerHTML=`<button>×</button><img src="${url}">`;
-  z.onclick=e=>{if(e.target===z || e.target.tagName==="BUTTON") z.remove();};
-  document.body.appendChild(z);
-}
-document.getElementById("themeBtn").onclick=()=>{
-  document.body.classList.toggle("light");
-  document.getElementById("themeBtn").textContent=document.body.classList.contains("light")?"☀️ Claro":"🌙 Escuro";
-};
-search.oninput=render;
 
-let deferredPrompt;
-const installBtn=document.getElementById("installBtn");
-window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();deferredPrompt=e;installBtn.hidden=false;});
-installBtn.onclick=async()=>{if(!deferredPrompt)return;deferredPrompt.prompt();await deferredPrompt.userChoice;deferredPrompt=null;installBtn.hidden=true;};
-if("serviceWorker" in navigator) navigator.serviceWorker.register("./sw.js");
-render();
+window.addEventListener("appinstalled", () => {
+  if (installBtn) installBtn.textContent = "✅ App instalado";
+});
+
+const DATA = {"regioes": [["Região glútea", "Onde encontrar: na face posterior do quadril, sobre os músculos glúteos, limitada superiormente pela crista ilíaca e medialmente pelo sacro."], ["Fenda interglútea", "Onde encontrar: no sulco mediano entre as nádegas, sobre sacro e cóccix."], ["Sulco infraglúteo", "Onde encontrar: na prega inferior da nádega, separando região glútea da coxa posterior."], ["Região do quadril", "Onde encontrar: área lateral entre pelve e coxa, ao redor da articulação coxofemoral e trocânter maior."], ["Região da coxa", "Onde encontrar: segmento entre quadril e joelho; observe faces anterior, medial, lateral e posterior."], ["Região femoral anterior", "Onde encontrar: face anterior da coxa, região do quadríceps e trajeto da artéria femoral."], ["Trígono femoral", "Onde encontrar: logo abaixo do ligamento inguinal, entre sartório lateralmente e adutor longo medialmente."], ["Região femoral posterior", "Onde encontrar: face posterior da coxa, região dos músculos isquiotibiais."], ["Região do joelho", "Onde encontrar: transição entre coxa e perna, ao redor da patela, côndilos femorais e tíbia proximal."], ["Região genicular anterior", "Onde encontrar: face anterior do joelho, sobre patela e ligamento patelar."], ["Região genicular posterior", "Onde encontrar: face posterior do joelho, principalmente na fossa poplítea."], ["Fossa poplítea", "Onde encontrar: depressão posterior do joelho, limitada por isquiotibiais e gastrocnêmio."], ["Região crural anterior", "Onde encontrar: face anterior da perna, lateral à tíbia, no compartimento extensor."], ["Região crural posterior", "Onde encontrar: panturrilha, face posterior da perna."], ["Região talocrural anterior", "Onde encontrar: face anterior do tornozelo."], ["Região talocrural posterior", "Onde encontrar: face posterior do tornozelo, região do tendão calcâneo."], ["Região retromaleolar lateral", "Onde encontrar: atrás do maléolo lateral, trajeto dos tendões fibulares."], ["Região retromaleolar medial", "Onde encontrar: atrás do maléolo medial, região do túnel do tarso."], ["Regiões do pé", "Onde encontrar: no pé, separando dorso, planta, margens, tarso, metatarso e dedos."], ["Região calcânea", "Onde encontrar: calcanhar, sobre o osso calcâneo."], ["Dorso do pé", "Onde encontrar: face superior do pé, onde passam tendões extensores e artéria dorsal do pé."], ["Planta", "Onde encontrar: face inferior do pé, região da aponeurose plantar."], ["Margem lateral do pé", "Onde encontrar: borda externa do pé, em direção ao 5º metatarso."], ["Margem medial do pé", "Onde encontrar: borda interna do pé, em direção ao hálux."], ["Arco longitudinal lateral", "Onde encontrar: borda lateral da planta do pé, mais baixo e apoiado."], ["Arco longitudinal medial", "Onde encontrar: borda medial da planta, arco mais alto."], ["Arco transverso do pé", "Onde encontrar: atravessa o pé no sentido medial-lateral, especialmente na região metatarsal."], ["Região tarsal", "Onde encontrar: parte proximal do pé, próxima ao tornozelo."], ["Região metatarsal", "Onde encontrar: região média/anterior do pé, sobre os metatarsos."], ["Dedos do pé", "Onde encontrar: extremidade distal do pé, formada pelas falanges."]], "fascias": [["Fáscia lata", "Onde encontrar: fáscia profunda que envolve toda a coxa."], ["Trato iliotibial", "Onde encontrar: espessamento lateral da fáscia lata, da crista ilíaca até a tíbia lateral."], ["Trato iliopatelar", "Onde encontrar: espessamento fascial em direção à patela."], ["Septo intermuscular lateral da coxa", "Onde encontrar: na face lateral da coxa, fixado ao fêmur, separando compartimentos."], ["Septo intermuscular medial da coxa", "Onde encontrar: profundamente na face medial da coxa."], ["Septo intermuscular posterior da coxa", "Onde encontrar: separando planos posteriores da coxa."], ["Compartimento anterior da coxa", "Onde encontrar: região do quadríceps femoral e sartório."], ["Compartimento posterior da coxa", "Onde encontrar: região dos isquiotibiais."], ["Compartimento medial da coxa", "Onde encontrar: região dos músculos adutores."], ["Fáscia da perna/crural", "Onde encontrar: fáscia profunda envolvendo a perna."], ["Retináculo dos músculos flexores", "Onde encontrar: atrás do maléolo medial, formando o túnel do tarso."], ["Retináculo superior dos extensores", "Onde encontrar: face anterior distal da perna, acima do tornozelo."], ["Retináculo inferior dos extensores", "Onde encontrar: dorso do tornozelo/pé, em formato de Y."], ["Retináculo superior dos fibulares", "Onde encontrar: atrás do maléolo lateral."], ["Retináculo inferior dos fibulares", "Onde encontrar: região lateral do calcâneo."], ["Septo intermuscular anterior da perna", "Onde encontrar: entre compartimento anterior e lateral da perna."], ["Septo intermuscular posterior da perna", "Onde encontrar: entre compartimento lateral e posterior."], ["Septo intermuscular transverso da perna", "Onde encontrar: separa porção superficial e profunda do compartimento posterior."], ["Membrana interóssea da perna", "Onde encontrar: entre tíbia e fíbula."], ["Compartimento anterior da perna", "Onde encontrar: anterior à membrana interóssea; contém extensores e artéria tibial anterior."], ["Compartimento posterior da perna", "Onde encontrar: panturrilha e plano profundo posterior."], ["Parte superficial", "Onde encontrar: gastrocnêmio, sóleo e plantar."], ["Parte profunda", "Onde encontrar: tibial posterior, flexores longos e poplíteo."], ["Compartimento lateral da perna", "Onde encontrar: lateral à fíbula, região dos músculos fibulares."], ["Fáscia dorsal do pé", "Onde encontrar: no dorso do pé, sobre tendões extensores."], ["Fáscia plantar lateral", "Onde encontrar: porção lateral da planta do pé."], ["Fáscia plantar medial", "Onde encontrar: porção medial da planta do pé."], ["Aponeurose plantar", "Onde encontrar: centro da planta, espessamento resistente da fáscia plantar."], ["Feixes digitais da aponeurose plantar", "Onde encontrar: prolongamentos da aponeurose em direção aos dedos."], ["Fascículos transversos da aponeurose plantar", "Onde encontrar: fibras transversais na planta do pé."], ["Ligamentos metatarsais transversos superficiais", "Onde encontrar: próximos às cabeças dos metatarsos."]], "arterias": [["Artéria ilíaca externa", "Onde encontrar: na pelve, sobre o psoas maior; ao passar sob o ligamento inguinal vira artéria femoral."], ["Artéria femoral", "Onde encontrar: no trígono femoral, abaixo do ligamento inguinal; entre nervo femoral lateral e veia femoral medial."], ["Artéria circunflexa ilíaca superficial", "Onde encontrar: ramo superficial da femoral que segue lateralmente em direção à EIAS."], ["Artéria epigástrica superficial", "Onde encontrar: ramo superficial da femoral que sobe para a parede abdominal anterior."], ["Artéria pudenda externa superficial", "Onde encontrar: ramo medial superficial da femoral para genitais externos."], ["Artéria pudenda externa profunda", "Onde encontrar: ramo medial mais profundo em direção à região pudenda."], ["Artéria femoral profunda", "Onde encontrar: grande ramo posterior/lateral da femoral; mergulha profundamente atrás do adutor longo."], ["Artéria circunflexa femoral medial", "Onde encontrar: geralmente sai da femoral profunda; segue medial e posteriormente entre iliopsoas/pectíneo para colo do fêmur."], ["Artéria circunflexa femoral lateral", "Onde encontrar: geralmente sai da femoral profunda; vai lateralmente, profunda ao sartório e reto femoral."], ["Ramo descendente da circunflexa femoral lateral", "Onde encontrar: desce pela face anterolateral da coxa, acompanhando o vasto lateral até a rede genicular."], ["Artéria descendente do joelho", "Onde encontrar: ramo distal da femoral antes do hiato do adutor, descendo medialmente ao joelho."], ["Artéria obturatória", "Onde encontrar: na pelve e canal obturatório, próxima ao forame obturado."], ["Artéria glútea superior", "Onde encontrar: sai da pelve acima do piriforme, na região glútea superior."], ["Artéria glútea inferior", "Onde encontrar: sai abaixo do piriforme, profunda ao glúteo máximo."], ["Artéria poplítea", "Onde encontrar: profundamente na fossa poplítea, atrás do joelho."], ["Artéria tibial anterior", "Onde encontrar: atravessa a membrana interóssea e segue no compartimento anterior da perna."], ["Tronco tíbiofibular", "Onde encontrar: curto segmento após a poplítea, antes de dividir em tibial posterior e fibular."], ["Artéria tibial posterior", "Onde encontrar: compartimento posterior profundo; passa atrás do maléolo medial."], ["Artéria fibular", "Onde encontrar: ramo lateral da tibial posterior, junto à fíbula."], ["Artéria superior lateral do joelho", "Onde encontrar: acima e lateral ao joelho, na rede genicular."], ["Artéria superior medial do joelho", "Onde encontrar: acima e medial ao joelho."], ["Artéria inferior lateral do joelho", "Onde encontrar: abaixo e lateral ao joelho."], ["Artéria inferior medial do joelho", "Onde encontrar: abaixo e medial ao joelho."], ["Artéria média do joelho", "Onde encontrar: ramo profundo que perfura a cápsula articular posterior do joelho."], ["Artéria recorrente tibial anterior", "Onde encontrar: sobe da tibial anterior para a rede genicular."], ["Artéria tarsal lateral", "Onde encontrar: dorso lateral do pé."], ["Artéria dorsal do pé", "Onde encontrar: continuação da tibial anterior no dorso do pé, entre tendões extensores."], ["Artéria arqueada", "Onde encontrar: transversalmente na base dos metatarsos dorsais."], ["Artéria plantar profunda", "Onde encontrar: ramo que mergulha do dorso para a planta, ajudando no arco plantar profundo."], ["1ª artéria metatarsal dorsal", "Onde encontrar: primeiro espaço intermetatarsal dorsal."], ["Artérias metatarsais dorsais", "Onde encontrar: entre os metatarsos, no dorso do pé."], ["Artérias digitais dorsais comuns", "Onde encontrar: ramos dorsais antes da divisão para os dedos."], ["Artérias digitais dorsais próprias", "Onde encontrar: nas margens dorsais dos dedos."], ["Artéria plantar medial", "Onde encontrar: ramo medial da tibial posterior, na planta medial."], ["Artéria plantar lateral", "Onde encontrar: ramo lateral da tibial posterior, indo para arco plantar profundo."], ["Arco plantar profundo", "Onde encontrar: profundamente na planta, próximo às bases dos metatarsos."], ["Artérias metatarsais plantares", "Onde encontrar: entre os metatarsos, na planta."], ["Artérias digitais plantares comuns", "Onde encontrar: antes da divisão digital plantar."], ["Artérias digitais plantares próprias", "Onde encontrar: margens plantares dos dedos."]], "veias": [["Veias digitais dorsais", "Onde encontrar: dorso dos dedos do pé."], ["Veias metatarsais dorsais", "Onde encontrar: dorso do pé, entre metatarsos."], ["Arco venoso dorsal do pé", "Onde encontrar: arco superficial no dorso do pé, origem das safenas."], ["Rede venosa dorsal", "Onde encontrar: rede venosa superficial no dorso do pé."], ["Veia dorsal do hálux", "Onde encontrar: dorso do hálux."], ["Veia safena magna", "Onde encontrar: anterior ao maléolo medial; sobe pela face medial da perna e coxa até o hiato safeno."], ["Veia cutânea lateral da coxa", "Onde encontrar: tecido subcutâneo da face lateral da coxa."], ["Veia cutânea anterior da coxa", "Onde encontrar: tecido subcutâneo da face anterior da coxa."], ["Hiato safeno", "Onde encontrar: abertura na fáscia lata na região proximal medial da coxa."], ["Margem falciforme", "Onde encontrar: borda do hiato safeno."], ["Fáscia cribriforme", "Onde encontrar: lâmina perfurada sobre o hiato safeno."], ["Veia dorsal do 5º dedo", "Onde encontrar: dorso do quinto dedo."], ["Veia marginal lateral", "Onde encontrar: margem lateral do pé; continua como safena parva."], ["Veia marginal medial", "Onde encontrar: margem medial do pé; continua como safena magna."], ["Veia safena parva", "Onde encontrar: posterior ao maléolo lateral; sobe pela panturrilha e drena na poplítea."], ["Veia safena acessória", "Onde encontrar: trajeto superficial acessório próximo à safena magna."], ["Veias digitais plantares", "Onde encontrar: planta dos dedos."], ["Veias metatarsais plantares", "Onde encontrar: planta, entre metatarsos."], ["Arco venoso plantar", "Onde encontrar: arco profundo da planta."], ["Veia plantar lateral", "Onde encontrar: acompanha a artéria plantar lateral."], ["Veia plantar medial", "Onde encontrar: acompanha a artéria plantar medial."], ["Veia tibial posterior", "Onde encontrar: compartimento posterior profundo, junto à artéria tibial posterior."], ["Veia fibular", "Onde encontrar: junto à artéria fibular, próxima à fíbula."], ["Veia tibial anterior", "Onde encontrar: compartimento anterior da perna, junto à artéria tibial anterior."], ["Veia poplítea", "Onde encontrar: fossa poplítea, entre artéria poplítea e nervo tibial."], ["Veia femoral", "Onde encontrar: trígono femoral, medial à artéria femoral."], ["Veia femoral profunda", "Onde encontrar: acompanha a artéria femoral profunda."], ["Veias perfurantes", "Onde encontrar: atravessam fáscia profunda, conectando veias superficiais e profundas."], ["Veia glútea superior", "Onde encontrar: região glútea superior, acompanhando artéria glútea superior."], ["Veia glútea inferior", "Onde encontrar: região glútea inferior, acompanhando artéria glútea inferior."], ["Veia ilíaca externa", "Onde encontrar: continuação da veia femoral após o ligamento inguinal."]], "linfonodos": [["Linfonodos poplíteos", "Onde encontrar: fossa poplítea, próximos aos vasos poplíteos."], ["Linfonodos inguinais superficiais", "Onde encontrar: região inguinal superficial, abaixo do ligamento inguinal."], ["Linfonodos inguinais profundos", "Onde encontrar: profundamente, próximos à veia femoral."], ["Linfonodos ilíacos externos", "Onde encontrar: ao longo dos vasos ilíacos externos."], ["Linfonodos ilíacos comuns", "Onde encontrar: ao longo dos vasos ilíacos comuns."], ["Troncos linfáticos lombares", "Onde encontrar: região lombar posterior, recebendo linfa dos membros inferiores e pelve."]]};
+const DB="mmii_pwa_v3"; let current="regioes"; let saved=JSON.parse(localStorage.getItem(DB)||"{}");
+const $=id=>document.getElementById(id); const key=(t,i)=>t+"_"+i; const save=()=>localStorage.setItem(DB,JSON.stringify(saved));
+function render(){let q=$("search").value.toLowerCase(); let box=$("cards"); box.innerHTML=""; DATA[current].forEach((it,i)=>{if(q&&!it.join(" ").toLowerCase().includes(q))return; let k=key(current,i); if(!saved[k])saved[k]={note:"",files:[]}; let c=document.createElement("article"); c.className="card"; c.innerHTML=`<div class="top"><div class="num">${i+1}</div><div><h3>${it[0]}</h3><small>Clique para mostrar onde encontrar</small></div></div><div class="body"><div class="info">${it[1]}</div><textarea class="note" placeholder="Anotações da peça, dúvidas, referências...">${saved[k].note||""}</textarea><div class="actions"><label class="camera">📷 Tirar quantas fotos quiser<input type="file" accept="image/*" capture="environment" multiple hidden></label><label class="file">📎 Incluir arquivos<input type="file" multiple hidden></label><button class="save">Salvar</button><button class="clear">Limpar anexos</button></div><div class="preview"></div></div>`; c.querySelector(".top").onclick=()=>c.classList.toggle("open"); let note=c.querySelector(".note"); c.querySelector(".save").onclick=()=>{saved[k].note=note.value;save();alert("Salvo!")}; c.querySelector(".clear").onclick=()=>{saved[k].files=[];save();render()}; c.querySelectorAll("input[type=file]").forEach(inp=>inp.onchange=async e=>{for(const f of [...e.target.files])saved[k].files.push({name:f.name,type:f.type,data:await dataURL(f)});save();render()}); let p=c.querySelector(".preview"); saved[k].files.forEach((f,j)=>{let d=document.createElement("div");d.className="thumb";d.innerHTML=f.type.startsWith("image/")?`<img src="${f.data}"><button>×</button>`:`📄<br>${f.name}<button>×</button>`;d.querySelector("button").onclick=()=>{saved[k].files.splice(j,1);save();render()};p.appendChild(d)}); box.appendChild(c)});}
+function dataURL(f){return new Promise(r=>{let fr=new FileReader();fr.onload=()=>r(fr.result);fr.readAsDataURL(f)})}
+document.querySelectorAll(".tab").forEach(b=>b.onclick=()=>{document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));b.classList.add("active");current=b.dataset.tab;render()});
+$("search").oninput=render; $("openAll").onclick=()=>document.querySelectorAll(".card").forEach(c=>c.classList.add("open")); $("closeAll").onclick=()=>document.querySelectorAll(".card").forEach(c=>c.classList.remove("open"));
+$("themeBtn").onclick=()=>{document.body.classList.toggle("dark");localStorage.setItem("theme",document.body.classList.contains("dark")?"dark":"light")}; if(localStorage.getItem("theme")==="dark")document.body.classList.add("dark");
+$("export").onclick=()=>{let a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify(saved,null,2)],{type:"application/json"}));a.download="dados_mmii.json";a.click()};
+$("pdfBtn").onclick=gerarPDF;
+
+async function gerarPDF(){
+  if(!window.jspdf){alert("Biblioteca PDF não carregou. Conecte à internet na primeira execução ou baixe jsPDF local."); return;}
+  const { jsPDF } = window.jspdf;
+  const pdf = new jsPDF("p","mm","a4");
+  const W=210, H=297, M=12; let y=14;
+  function addText(text, x, size=11, bold=false){
+    pdf.setFont("helvetica", bold?"bold":"normal"); pdf.setFontSize(size);
+    const lines=pdf.splitTextToSize(text, W-M*2);
+    lines.forEach(line=>{ if(y>282){pdf.addPage(); y=14;} pdf.text(line,x,y); y+=size*0.45; });
+  }
+  pdf.setFillColor(124,58,237); pdf.rect(0,0,W,28,"F");
+  pdf.setTextColor(255,255,255); pdf.setFontSize(17); pdf.setFont("helvetica","bold");
+  pdf.text("Roteiro Topográfica de MMII - Aula 1", M, 17);
+  pdf.setTextColor(0,0,0); y=36;
+  for(const tab of Object.keys(DATA)){
+    if(y>260){pdf.addPage(); y=14;}
+    addText(tab.toUpperCase(), M, 15, true); y+=2;
+    for(let i=0;i<DATA[tab].length;i++){
+      const it=DATA[tab][i]; const k=key(tab,i); const rec=saved[k]||{note:"",files:[]};
+      addText(`${i+1}. ${it[0]}`, M, 12, true);
+      addText(it[1], M+3, 10, false);
+      if(rec.note) addText("Anotação: "+rec.note, M+3, 10, false);
+      for(const f of rec.files||[]){
+        if(f.type && f.type.startsWith("image/")){
+          try{
+            if(y>210){pdf.addPage(); y=14;}
+            pdf.addImage(f.data, "JPEG", M+3, y, 80, 60, undefined, "FAST");
+            y+=64;
+          }catch(e){
+            try{ pdf.addImage(f.data, "PNG", M+3, y, 80, 60); y+=64; }catch(err){ addText("Imagem anexada: "+f.name, M+3, 9); }
+          }
+        } else {
+          addText("Arquivo anexado: "+f.name, M+3, 9);
+        }
+      }
+      y+=3;
+    }
+  }
+  pdf.save("roteiro_mmii_completo.pdf");
+}
+
+$("aiFab").onclick=()=>$("aiPanel").classList.toggle("open"); $("xAi").onclick=()=>$("aiPanel").classList.remove("open"); $("sendAi").onclick=ask; $("qAi").onkeydown=e=>{if(e.key==="Enter")ask()};
+function msg(t,cl){let d=document.createElement("div");d.className=cl;d.textContent=t;$("chat").appendChild(d);d.scrollIntoView()}
+function ask(){let q=$("qAi").value.trim();if(!q)return;msg(q,"user");$("qAi").value="";setTimeout(()=>msg(answer(q),"bot"),200)}
+function answer(q){let t=q.toLowerCase(); if(t.includes("femoral profunda"))return "A artéria femoral profunda nasce da femoral e mergulha profundamente atrás do adutor longo."; if(t.includes("circunflexa lateral"))return "A circunflexa femoral lateral geralmente nasce da femoral profunda, passa lateralmente sob sartório e reto femoral e divide-se em ramos ascendente, transverso e descendente."; if(t.includes("circunflexa medial"))return "A circunflexa femoral medial geralmente nasce da femoral profunda e segue medial/posterior para cabeça e colo do fêmur."; if(t.includes("safena magna"))return "A safena magna sobe anterior ao maléolo medial, pela face medial da perna/coxa, e drena na femoral pelo hiato safeno."; if(t.includes("poplítea"))return "Na fossa poplítea, de superficial para profundo: nervo tibial, veia poplítea e artéria poplítea."; let all=Object.values(DATA).flat(); let f=all.find(x=>x[0].toLowerCase().includes(t)); return f?f[0]+": "+f[1]:"Pesquise pelo nome da estrutura ou pergunte de forma curta, exemplo: femoral profunda, dorsal do pé, poplítea."}
+if("serviceWorker" in navigator)navigator.serviceWorker.register("sw.js"); render();
+
+
+// ZOOM DAS FOTOS ANEXADAS
+function ensureZoomOverlay(){
+  let overlay = document.getElementById("zoomOverlay");
+  if(!overlay){
+    overlay = document.createElement("div");
+    overlay.id = "zoomOverlay";
+    overlay.className = "zoomOverlay";
+    overlay.innerHTML = `
+      <button class="zoomClose" aria-label="Fechar">×</button>
+      <img id="zoomImg" alt="Imagem ampliada">
+      <div class="zoomHint">Toque fora da imagem ou no X para fechar</div>
+    `;
+    document.body.appendChild(overlay);
+    overlay.addEventListener("click", (e)=>{
+      if(e.target.id === "zoomOverlay" || e.target.classList.contains("zoomClose")){
+        overlay.classList.remove("open");
+      }
+    });
+  }
+  return overlay;
+}
+
+document.addEventListener("click", (e)=>{
+  const img = e.target.closest(".thumb img");
+  if(!img) return;
+  e.stopPropagation();
+  const overlay = ensureZoomOverlay();
+  document.getElementById("zoomImg").src = img.src;
+  overlay.classList.add("open");
+});
+
+
+// ZOOM AVANÇADO: AMPLIAR, ARRASTAR E PINÇA NO CELULAR
+let zoomState = {
+  scale: 1,
+  x: 0,
+  y: 0,
+  dragging: false,
+  startX: 0,
+  startY: 0,
+  lastX: 0,
+  lastY: 0,
+  pinchStart: 0,
+  startScale: 1
+};
+
+function applyZoomTransform(){
+  const img = document.getElementById("zoomImg");
+  if(!img) return;
+  img.style.transform = `translate(${zoomState.x}px, ${zoomState.y}px) scale(${zoomState.scale})`;
+}
+
+function resetZoom(){
+  zoomState.scale = 1;
+  zoomState.x = 0;
+  zoomState.y = 0;
+  applyZoomTransform();
+}
+
+function zoomIn(){
+  zoomState.scale = Math.min(5, zoomState.scale + 0.35);
+  applyZoomTransform();
+}
+
+function zoomOut(){
+  zoomState.scale = Math.max(1, zoomState.scale - 0.35);
+  if(zoomState.scale === 1){ zoomState.x = 0; zoomState.y = 0; }
+  applyZoomTransform();
+}
+
+function distanceTouches(touches){
+  const dx = touches[0].clientX - touches[1].clientX;
+  const dy = touches[0].clientY - touches[1].clientY;
+  return Math.sqrt(dx*dx + dy*dy);
+}
+
+function createAdvancedZoomOverlay(){
+  let overlay = document.getElementById("zoomOverlay");
+  if(overlay) overlay.remove();
+
+  overlay = document.createElement("div");
+  overlay.id = "zoomOverlay";
+  overlay.className = "zoomOverlay";
+  overlay.innerHTML = `
+    <button class="zoomClose" aria-label="Fechar">×</button>
+    <div class="zoomStage">
+      <img id="zoomImg" alt="Imagem ampliada">
+    </div>
+    <div class="zoomControls">
+      <button id="zoomMinus">−</button>
+      <button id="zoomReset">100%</button>
+      <button id="zoomPlus">+</button>
+    </div>
+    <div class="zoomHint">Use +/−, arraste a imagem ou use pinça com dois dedos</div>
+  `;
+  document.body.appendChild(overlay);
+
+  const img = document.getElementById("zoomImg");
+
+  overlay.querySelector(".zoomClose").onclick = () => overlay.classList.remove("open");
+  document.getElementById("zoomPlus").onclick = zoomIn;
+  document.getElementById("zoomMinus").onclick = zoomOut;
+  document.getElementById("zoomReset").onclick = resetZoom;
+
+  overlay.addEventListener("click", (e)=>{
+    if(e.target.id === "zoomOverlay") overlay.classList.remove("open");
+  });
+
+  img.addEventListener("wheel", (e)=>{
+    e.preventDefault();
+    if(e.deltaY < 0) zoomIn(); else zoomOut();
+  }, {passive:false});
+
+  img.addEventListener("mousedown", (e)=>{
+    e.preventDefault();
+    zoomState.dragging = true;
+    img.classList.add("dragging");
+    zoomState.startX = e.clientX;
+    zoomState.startY = e.clientY;
+    zoomState.lastX = zoomState.x;
+    zoomState.lastY = zoomState.y;
+  });
+
+  window.addEventListener("mousemove", (e)=>{
+    if(!zoomState.dragging) return;
+    zoomState.x = zoomState.lastX + (e.clientX - zoomState.startX);
+    zoomState.y = zoomState.lastY + (e.clientY - zoomState.startY);
+    applyZoomTransform();
+  });
+
+  window.addEventListener("mouseup", ()=>{
+    zoomState.dragging = false;
+    img.classList.remove("dragging");
+  });
+
+  img.addEventListener("touchstart", (e)=>{
+    if(e.touches.length === 1){
+      zoomState.dragging = true;
+      zoomState.startX = e.touches[0].clientX;
+      zoomState.startY = e.touches[0].clientY;
+      zoomState.lastX = zoomState.x;
+      zoomState.lastY = zoomState.y;
+    }
+    if(e.touches.length === 2){
+      zoomState.dragging = false;
+      zoomState.pinchStart = distanceTouches(e.touches);
+      zoomState.startScale = zoomState.scale;
+    }
+  }, {passive:false});
+
+  img.addEventListener("touchmove", (e)=>{
+    e.preventDefault();
+    if(e.touches.length === 1 && zoomState.dragging){
+      zoomState.x = zoomState.lastX + (e.touches[0].clientX - zoomState.startX);
+      zoomState.y = zoomState.lastY + (e.touches[0].clientY - zoomState.startY);
+      applyZoomTransform();
+    }
+    if(e.touches.length === 2){
+      const dist = distanceTouches(e.touches);
+      const ratio = dist / zoomState.pinchStart;
+      zoomState.scale = Math.max(1, Math.min(5, zoomState.startScale * ratio));
+      applyZoomTransform();
+    }
+  }, {passive:false});
+
+  img.addEventListener("touchend", ()=>{
+    zoomState.dragging = false;
+  });
+
+  return overlay;
+}
+
+document.addEventListener("click", (e)=>{
+  const imgThumb = e.target.closest(".thumb img");
+  if(!imgThumb) return;
+  e.stopPropagation();
+  const overlay = createAdvancedZoomOverlay();
+  document.getElementById("zoomImg").src = imgThumb.src;
+  resetZoom();
+  overlay.classList.add("open");
+}, true);

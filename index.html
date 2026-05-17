@@ -1,59 +1,38 @@
 <!doctype html>
 <html lang="pt-BR">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#020617">
-<title>Roteiro Exato — Artérias MMII</title>
-<link rel="manifest" href="manifest.json">
-<link rel="stylesheet" href="style.css">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#7c3aed">
+<title>Topográfica de MMII — Aula 1</title>
+<link rel="manifest" href="manifest.json"><link rel="stylesheet" href="style.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body>
-<header class="hero">
-  <div>
-    <p class="tag">ROTEIRO EXATO • MEMBRO INFERIOR</p>
-    <h1>Artérias do Membro Inferior</h1>
-    <p class="sub">Somente as 39 estruturas arteriais do roteiro, numeradas na mesma sequência. Informações ocultas por card, modo dia/noite, fotos, anexos, zoom e PDF.</p>
-  </div>
-  <div class="btns">
-    <button id="themeBtn">🌙 Escuro</button>
-    <button id="installBtn" hidden>📲 Instalar</button>
-    <button onclick="window.print()">📄 PDF</button>
-  </div>
+<header class="topbar">
+  <div><h1>Topográfica de MMII</h1><p>Roteiro prático interativo • Aula 1</p></div>
+  <div class="headerActions"><button id="installBtn">📲 Baixar app</button><button id="themeBtn">🌙</button></div>
 </header>
-
+<main>
+<section class="hero"><h2>Roteiro com informações ocultas</h2><p>Clique nos cards para revelar onde encontrar cada estrutura. Tire quantas fotos quiser, anexe arquivos e gere PDF completo.</p></section>
 <nav class="tabs">
-  <button class="tab active">Artérias MMII — roteiro exato</button>
+<button class="tab active" data-tab="regioes">Regiões</button>
+<button class="tab" data-tab="fascias">Fáscias/compartimentos</button>
+<button class="tab" data-tab="arterias">Artérias</button>
+<button class="tab" data-tab="veias">Veias</button>
+<button class="tab" data-tab="linfonodos">Linfonodos</button>
 </nav>
-
-<section class="bar">
-  <input id="search" placeholder="🔎 Buscar uma das 39 estruturas...">
+<section class="tools">
+<input id="search" placeholder="Pesquisar estrutura...">
+<button id="openAll">Mostrar tudo</button><button id="closeAll">Ocultar tudo</button>
+<button id="pdfBtn">Gerar PDF de tudo</button><button id="export">Exportar dados</button>
 </section>
-
-<main id="cards" class="grid"></main>
-
-<template id="tpl">
-<article class="card">
-  <div class="top">
-    <span class="num"></span>
-    <span class="aba">Artérias MMII</span>
-  </div>
-  <h2></h2>
-  <button class="toggle">👁️ Mostrar informações</button>
-  <div class="info">
-    <p><b>📍 Onde encontrar:</b> <span class="onde"></span></p>
-    <p><b>🔎 Como localizar na peça:</b> <span class="loc"></span></p>
-  </div>
-  <textarea placeholder="Observações da peça, descrição da foto ou avaliação do grupo..."></textarea>
-  <div class="actions">
-    <label>📷 Tirar fotos<input class="photo" type="file" accept="image/*" capture="environment" multiple></label>
-    <label>📎 Anexar arquivos<input class="file" type="file" multiple></label>
-  </div>
-  <div class="preview"></div>
-</article>
-</template>
-
-<script id="data" type="application/json">[{"aba": "Artérias MMII — roteiro exato", "numero": 1, "nome": "Artéria ilíaca externa", "onde": "Na pelve; corre sobre o músculo psoas maior; dirige-se ao ligamento inguinal.", "localizar": "Procure o ligamento inguinal. A artéria ilíaca externa passa profundamente a ele. Ao cruzar o ligamento inguinal, continua como artéria femoral."}, {"aba": "Artérias MMII — roteiro exato", "numero": 2, "nome": "Artéria femoral", "onde": "Logo abaixo do ligamento inguinal, dentro do trígono femoral.", "localizar": "No trígono femoral: veia femoral medial, nervo femoral lateral. Palpe a metade da linha entre EIAS e sínfise púbica."}, {"aba": "Artérias MMII — roteiro exato", "numero": 3, "nome": "Circunflexa ilíaca superficial", "onde": "Sai da femoral logo abaixo do ligamento inguinal; corre lateralmente em direção à EIAS.", "localizar": "Fica superficial, acompanhando a região inguinal lateral."}, {"aba": "Artérias MMII — roteiro exato", "numero": 4, "nome": "Epigástrica superficial", "onde": "Pequeno ramo da femoral; sobe anteriormente para a parede abdominal.", "localizar": "Siga em direção ao umbigo."}, {"aba": "Artérias MMII — roteiro exato", "numero": 5, "nome": "Pudenda externa superficial", "onde": "Sai medialmente da femoral; vai para genitais externos.", "localizar": "Cruza superficialmente a região medial da coxa proximal."}, {"aba": "Artérias MMII — roteiro exato", "numero": 6, "nome": "Pudenda externa profunda", "onde": "Mais profunda que a pudenda externa superficial.", "localizar": "Procure passando entre músculos mediais da coxa."}, {"aba": "Artérias MMII — roteiro exato", "numero": 7, "nome": "Femoral profunda", "onde": "Grande ramo posterior/lateral da femoral.", "localizar": "Surge cerca de 3–5 cm abaixo do ligamento inguinal e mergulha profundamente atrás do adutor longo."}, {"aba": "Artérias MMII — roteiro exato", "numero": 8, "nome": "Circunflexa femoral medial", "onde": "Ramo da femoral profunda; vai posteriormente para o colo do fêmur.", "localizar": "Procure entre iliopsoas e pectíneo. Importante na irrigação da cabeça do fêmur."}, {"aba": "Artérias MMII — roteiro exato", "numero": 9, "nome": "Circunflexa femoral lateral", "onde": "Sai lateralmente da femoral profunda.", "localizar": "Passa profundamente ao sartório e ao reto femoral."}, {"aba": "Artérias MMII — roteiro exato", "numero": 10, "nome": "Ramo descendente da circunflexa femoral lateral", "onde": "Desce na face lateral/anterior da coxa.", "localizar": "Acompanha o músculo vasto lateral."}, {"aba": "Artérias MMII — roteiro exato", "numero": 11, "nome": "Artéria descendente do joelho", "onde": "Último ramo da femoral; surge antes do hiato do adutor.", "localizar": "Desce medialmente ao joelho."}, {"aba": "Artérias MMII — roteiro exato", "numero": 12, "nome": "Artéria obturatória", "onde": "Ramo da ilíaca interna.", "localizar": "Passa pelo canal obturatório. Procure perto do músculo obturador externo e do forame obturado."}, {"aba": "Artérias MMII — roteiro exato", "numero": 13, "nome": "Glútea superior", "onde": "Sai da pelve acima do músculo piriforme.", "localizar": "Acompanha nervo glúteo superior e glúteo médio."}, {"aba": "Artérias MMII — roteiro exato", "numero": 14, "nome": "Glútea inferior", "onde": "Sai abaixo do músculo piriforme.", "localizar": "Acompanha nervo glúteo inferior e região do glúteo máximo."}, {"aba": "Artérias MMII — roteiro exato", "numero": 15, "nome": "Artéria poplítea", "onde": "Continuação da femoral, dentro da fossa poplítea.", "localizar": "Na fossa poplítea, relação superficial para profundo: nervo tibial, veia poplítea e artéria poplítea."}, {"aba": "Artérias MMII — roteiro exato", "numero": 16, "nome": "Tibial anterior", "onde": "Perfura a membrana interóssea e vai para o compartimento anterior da perna.", "localizar": "Fica entre tibial anterior e extensor longo dos dedos."}, {"aba": "Artérias MMII — roteiro exato", "numero": 17, "nome": "Tronco tíbiofibular", "onde": "Pequeno tronco após bifurcação da poplítea.", "localizar": "Logo após a saída da tibial anterior; divide-se em tibial posterior e fibular."}, {"aba": "Artérias MMII — roteiro exato", "numero": 18, "nome": "Tibial posterior", "onde": "Compartimento posterior profundo.", "localizar": "Passa atrás do maléolo medial. Pulso tibial posterior: atrás do maléolo medial."}, {"aba": "Artérias MMII — roteiro exato", "numero": 19, "nome": "Fibular", "onde": "Ramo lateral da tibial posterior.", "localizar": "Corre próximo da fíbula."}, {"aba": "Artérias MMII — roteiro exato", "numero": 20, "nome": "Superior lateral do joelho", "onde": "Acima e lateral ao joelho.", "localizar": "Artéria genicular da rede arterial do joelho."}, {"aba": "Artérias MMII — roteiro exato", "numero": 21, "nome": "Superior medial do joelho", "onde": "Acima e medial ao joelho.", "localizar": "Artéria genicular da rede arterial do joelho."}, {"aba": "Artérias MMII — roteiro exato", "numero": 22, "nome": "Inferior lateral do joelho", "onde": "Abaixo e lateral ao joelho.", "localizar": "Artéria genicular da rede arterial do joelho."}, {"aba": "Artérias MMII — roteiro exato", "numero": 23, "nome": "Inferior medial do joelho", "onde": "Abaixo e medial ao joelho.", "localizar": "Artéria genicular da rede arterial do joelho."}, {"aba": "Artérias MMII — roteiro exato", "numero": 24, "nome": "Média do joelho", "onde": "Perfura profundamente a cápsula articular.", "localizar": "Vai diretamente para o interior do joelho."}, {"aba": "Artérias MMII — roteiro exato", "numero": 25, "nome": "Recorrente tibial anterior", "onde": "Sobe da tibial anterior.", "localizar": "Retorna para a rede arterial do joelho."}, {"aba": "Artérias MMII — roteiro exato", "numero": 26, "nome": "Tarsal lateral", "onde": "Face lateral do dorso do pé.", "localizar": "Procure no dorso lateral do pé."}, {"aba": "Artérias MMII — roteiro exato", "numero": 27, "nome": "Dorsal do pé", "onde": "Continuação da tibial anterior.", "localizar": "No dorso do pé, entre tendão do hálux e tendão do extensor longo dos dedos. Pulso dorsal do pé."}, {"aba": "Artérias MMII — roteiro exato", "numero": 28, "nome": "Arqueada", "onde": "Corre transversalmente no dorso do pé.", "localizar": "Na base dos metatarsos."}, {"aba": "Artérias MMII — roteiro exato", "numero": 29, "nome": "Plantar profunda", "onde": "Ramo profundo que vai para a planta do pé.", "localizar": "Comunica dorso e planta do pé."}, {"aba": "Artérias MMII — roteiro exato", "numero": 30, "nome": "1ª metatarsal dorsal", "onde": "Primeiro espaço interdigital.", "localizar": "Procure entre o hálux e o segundo dedo."}, {"aba": "Artérias MMII — roteiro exato", "numero": 31, "nome": "Metatarsais dorsais", "onde": "Entre os metatarsos dorsais.", "localizar": "Procure nos espaços intermetatarsais do dorso."}, {"aba": "Artérias MMII — roteiro exato", "numero": 32, "nome": "Digitais dorsais comuns", "onde": "Antes da divisão para os dedos.", "localizar": "Ramos que antecedem as digitais dorsais próprias."}, {"aba": "Artérias MMII — roteiro exato", "numero": 33, "nome": "Digitais dorsais próprias", "onde": "Nas laterais dos dedos.", "localizar": "Ramos terminais dorsais dos dedos."}, {"aba": "Artérias MMII — roteiro exato", "numero": 34, "nome": "Plantar medial", "onde": "Face medial da planta.", "localizar": "Menor ramo terminal da tibial posterior."}, {"aba": "Artérias MMII — roteiro exato", "numero": 35, "nome": "Plantar lateral", "onde": "Segue lateralmente pela planta.", "localizar": "Maior ramo terminal da tibial posterior."}, {"aba": "Artérias MMII — roteiro exato", "numero": 36, "nome": "Arco plantar profundo", "onde": "Profundo aos tendões flexores.", "localizar": "Formado principalmente pela plantar lateral + ramo plantar profundo da dorsal do pé."}, {"aba": "Artérias MMII — roteiro exato", "numero": 37, "nome": "Metatarsais plantares", "onde": "Entre os metatarsos plantares.", "localizar": "Procure nos espaços metatarsais da planta."}, {"aba": "Artérias MMII — roteiro exato", "numero": 38, "nome": "Digitais plantares comuns", "onde": "Antes da divisão digital.", "localizar": "Ramos que antecedem as digitais plantares próprias."}, {"aba": "Artérias MMII — roteiro exato", "numero": 39, "nome": "Digitais plantares próprias", "onde": "Nas margens dos dedos plantares.", "localizar": "Ramos terminais plantares dos dedos."}]</script>
+<section id="cards" class="grid"></section>
+</main>
+<button id="aiFab">🤖</button>
+<aside id="aiPanel">
+<div class="aiTop"><b>IA de dúvidas rápidas</b><button id="xAi">×</button></div>
+<div id="chat"><div class="bot">Pergunte algo curto: “onde passa a femoral profunda?”, “safena magna”, “dorsal do pé”.</div></div>
+<div class="aiInput"><input id="qAi" placeholder="Digite sua dúvida..."><button id="sendAi">Enviar</button></div>
+</aside>
 <script src="app.js"></script>
-</body>
-</html>
+</body></html>
